@@ -2,17 +2,25 @@ from roasterbro.constants import EXCLUDED_FILES , EXTENSION_LANGUAGE_MAP
 import os
 
 def check_important_files(files : list , directories : list) -> dict[str , bool]:
+    """Check whether some basic important files present or not in the repo"""
     readme = any(f.lower().startswith("readme") for f in files)
     _license = any(f.lower().startswith("license") for f in files)
     dockerfile = any(f.lower() == "dockerfile" for f in files)
     gitignore = any(f.lower() == ".gitignore" for f in files)
     has_test = any("test" in d.lower() for d in directories) or any("test" in f.lower() for f in files)
+    contributing = any(f.lower().startswith("contributing") for f in files)
+    changelog = any(f.lower().startswith("changelog") for f in files)
+    ci_cd = any(f.lower().startswith(".github") for f in directories)
+
     return {
-        "README":readme,
+        "README.md":readme,
         "LICENSE":_license,
         "dockerfile":dockerfile,
         "gitignore":gitignore,
-        "has_test":has_test
+        "has_test":has_test ,
+        "CONTRIBUTING.md":contributing ,
+        "CHANGELOG.md":changelog ,
+        "CI/CD": ci_cd
     }
 
 def languages_present(files) -> dict[str, int]:
