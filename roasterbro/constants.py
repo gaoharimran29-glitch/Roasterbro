@@ -1,3 +1,5 @@
+EXCLUDED_FILES = [".git" , ".pyc" , "__pycache__" , "roasterbro.egg-info"]
+
 EXTENSION_LANGUAGE_MAP = {
     # Systems & Core Programming
     ".c": "C",
