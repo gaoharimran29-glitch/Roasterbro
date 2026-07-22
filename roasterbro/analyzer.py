@@ -27,7 +27,8 @@ def analyze_repo(files: list , has_test: bool , directories: list) -> dict[str ,
             files_gt_1000_loc.append(file)
 
     largest_file_size = max(file_sizes.values())
-    average_file_size = sum(file_sizes.values()) / len(file_sizes.values())
+    average_file_size = sum(file_sizes.values()) / len(file_sizes.values()) ## in kb
+    average_file_size = round(average_file_size , 2)
 
     test_files = []
     test_files_count = 0
