@@ -1,5 +1,45 @@
 EXCLUDED_FILES = [".git" , ".pyc" , "__pycache__" , "roasterbro.egg-info"]
 
+DEPENDENCY_MAP = {
+    "package.json": {
+        "ecosystem": "Node.js",
+        "default_pm": "npm",
+        "lockfile_override": {
+            "pnpm-lock.yaml": "pnpm",
+            "yarn.lock": "yarn",
+            "package-lock.json": "npm",
+        },
+        "handler": "parse_node"
+    },
+    "pyproject.toml": {
+        "ecosystem": "Python",
+        "default_pm": "pip/pyproject",
+        "lockfile_override": {
+            "poetry.lock": "poetry",
+            "Pipfile.lock": "pipenv"
+        },
+        "handler": "parse_pyproject"
+    },
+    "requirements.txt": {
+        "ecosystem": "Python",
+        "default_pm": "pip",
+        "lockfile_override": {},
+        "handler": "parse_requirements"
+    },
+    "Cargo.toml": {
+        "ecosystem": "Rust",
+        "default_pm": "cargo",
+        "lockfile_override": {},
+        "handler": "parse_cargo"
+    },
+    "go.mod": {
+        "ecosystem": "Go",
+        "default_pm": "go modules",
+        "lockfile_override": {},
+        "handler": "parse_gomod"
+    }
+}
+
 EXTENSION_LANGUAGE_MAP = {
     # Systems & Core Programming
     ".c": "C",
