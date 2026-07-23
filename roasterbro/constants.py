@@ -1,3 +1,5 @@
+from utils import parse_node , parse_pyproject , parse_requirements , parse_cargo , parse_gomod
+
 EXCLUDED_FILES = [".git" , ".pyc" , "__pycache__" , "roasterbro.egg-info"]
 
 DEPENDENCY_MAP = {
@@ -9,7 +11,7 @@ DEPENDENCY_MAP = {
             "yarn.lock": "yarn",
             "package-lock.json": "npm",
         },
-        "handler": "parse_node"
+        "handler": parse_node
     },
     "pyproject.toml": {
         "ecosystem": "Python",
@@ -18,25 +20,25 @@ DEPENDENCY_MAP = {
             "poetry.lock": "poetry",
             "Pipfile.lock": "pipenv"
         },
-        "handler": "parse_pyproject"
+        "handler": parse_pyproject
     },
     "requirements.txt": {
         "ecosystem": "Python",
         "default_pm": "pip",
         "lockfile_override": {},
-        "handler": "parse_requirements"
+        "handler": parse_requirements
     },
     "Cargo.toml": {
         "ecosystem": "Rust",
         "default_pm": "cargo",
         "lockfile_override": {},
-        "handler": "parse_cargo"
+        "handler": parse_cargo
     },
     "go.mod": {
         "ecosystem": "Go",
         "default_pm": "go modules",
         "lockfile_override": {},
-        "handler": "parse_gomod"
+        "handler": parse_gomod
     }
 }
 

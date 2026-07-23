@@ -1,5 +1,39 @@
 import os
+from constants import DEPENDENCY_MAP
 
+def dependencies_analyzer(files: list) -> dict:
+    dependency_files = DEPENDENCY_MAP.keys()  # e.g., ["requirements.txt", "package.json"]
+    dep = {}
+    
+    for dep_file in dependency_files:
+        actual_file_path = next((f for f in files if dep_file in f), None)
+        if actual_file_path: 
+            config = DEPENDENCY_MAP[dep_file] 
+            ecosystem = config.get("ecosystem")
+            lockfile_override = config.get("lockfile_override")
+            parser = config.get("handler")
+            default_pm = config.get("default_pm")
+            pm = []
+            if lockfile_override.keys():
+                for lockfile in lockfile_override.keys():
+                    if any(lockfile in f for f in files):
+                        pm.append(lockfile_override.get(lockfile))
+
+            if not pm:
+                pm = default_pm
+
+            parse_result = parser(actual_file_path)
+            
+            dep.update({
+                actual_file_path: {
+                    "ecosystem": ecosystem,
+                    "package_manager": pm,
+                    **parse_result
+                }
+            })
+            
+    return dep
+            
 def analyze_repo(files: list , has_test: bool , directories: list) -> dict[str , int]:
     """Analyze the files of the repo and return deep metrics"""
     file_lines = {}
@@ -37,6 +71,8 @@ def analyze_repo(files: list , has_test: bool , directories: list) -> dict[str ,
         test_files = [d for d in directories if "test" in d.lower()] +  [d for d in files if "test" in d.lower()]
         test_files_count = len(test_files)
 
+    dependencies_analyze = dependencies_analyzer(files)
+
     return {
         "file_lines" : file_lines ,
         "file_sizes" : file_sizes ,
@@ -49,5 +85,5 @@ def analyze_repo(files: list , has_test: bool , directories: list) -> dict[str ,
         "largest_file_size" : largest_file_size ,
         "average_file_size" : average_file_size ,
         "test_files" : test_files ,
-        "test_files_count" : test_files_count
+        "test_files_count" : test_files_count ,
     }

@@ -55,3 +55,7 @@ def main():
     print("Average File size:         " , analayze_result['average_file_size'] , "KB")
     print("Test Files:                " , analayze_result['test_files'])
     print("Total test files:          " , len(analayze_result['test_files']))
+    print("=================================")
+    print("Dependecies used")
+    print("=================================")
+    print("Ecosystem: " , scanning_result["ecosystem"])
