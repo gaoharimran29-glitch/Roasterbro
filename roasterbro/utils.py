@@ -14,7 +14,7 @@ def parse_requirements(file_path: Path) -> Dict[str , Any]:
             }
     
     dependencies = []
-    with open(file_path, "r") as f:
+    with open(file_path, "r" , encoding='utf-8' , errors='ignore') as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -40,7 +40,7 @@ def parse_node(file_path: Path) -> Dict[str , Any]:
             "dependencies": []
         }
     
-    with open(file, 'r', encoding='utf-8') as file:
+    with open(file, 'r', encoding='utf-8' , errors='ignore') as file:
         try:
             content = json.load(file)
         except json.JSONDecodeError as e:
@@ -174,7 +174,7 @@ def parse_gomod(file_path: Path, include_indirect: bool = False) -> Dict[str, An
     
     in_require_block = False
 
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, "r", encoding="utf-8" , errors='ignore') as f:
         for line in f:
             line = line.strip()
 

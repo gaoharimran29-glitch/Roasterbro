@@ -1,8 +1,8 @@
 import os
-from constants import DEPENDENCY_MAP
+from roasterbro.constants import DEPENDENCY_MAP
 
 def dependencies_analyzer(files: list) -> dict:
-    dependency_files = DEPENDENCY_MAP.keys()  # e.g., ["requirements.txt", "package.json"]
+    dependency_files = DEPENDENCY_MAP.keys()
     dep = {}
     
     for dep_file in dependency_files:
@@ -28,7 +28,8 @@ def dependencies_analyzer(files: list) -> dict:
                 actual_file_path: {
                     "ecosystem": ecosystem,
                     "package_manager": pm,
-                    **parse_result
+                    "dependencies" : parse_result.get('dependencies' , []) ,
+                    "dep_count" : parse_result.get('dependency_count' , 0)
                 }
             })
             
@@ -39,7 +40,7 @@ def analyze_repo(files: list , has_test: bool , directories: list) -> dict[str ,
     file_lines = {}
     file_sizes = {}
     for file in files:
-        with open(file, "r") as f:
+        with open(file, "r" , encoding='utf-8' , errors='ignore') as f:
             line_count = sum(1 for line in f)
             size = os.path.getsize(file)
             file_lines[file] = line_count
@@ -86,4 +87,5 @@ def analyze_repo(files: list , has_test: bool , directories: list) -> dict[str ,
         "average_file_size" : average_file_size ,
         "test_files" : test_files ,
         "test_files_count" : test_files_count ,
+        "dep" : dependencies_analyze
     }

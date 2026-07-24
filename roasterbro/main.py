@@ -58,4 +58,9 @@ def main():
     print("=================================")
     print("Dependecies used")
     print("=================================")
-    print("Ecosystem: " , scanning_result["ecosystem"])
+    for file , dep in analayze_result['dep'].items():
+        print("File:             " , file)
+        print("Ecosystem:        " , dep['ecosystem'])
+        print("Package Manager:  " , dep['package_manager'])
+        print("Dependencies:     " , dep['dependencies'])
+        print("Dependency Count: " , dep['dep_count'])
