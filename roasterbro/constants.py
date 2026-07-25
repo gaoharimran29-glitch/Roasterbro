@@ -7,6 +7,83 @@ EXCLUDED_FILES = [".git", ".svn", ".hg", "venv", ".venv", "env", ".env", "node_m
 ".rar", ".db", ".sqlite", ".sqlite3", ".log", ".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg", 
 ".webp", ".mp3", ".mp4", ".wav", ".avi", ".ttf", ".woff", ".woff2", ".pdf", ".docx", ".xlsx"]
 
+## Please add keys and value only in lowercase
+FRAMEWORK_SIGNATURES = {
+    "python": {
+        "django": {
+            "packages": ["django"],
+            "category": "Web Framework",
+            "overrides": []
+        },
+        "fastaPI": {
+            "packages": ["fastapi"],
+            "category": "Web Framework",
+            "overrides": []
+        },
+        "flask": {
+            "packages": ["flask"],
+            "category": "Web Framework",
+            "overrides": []
+        }
+    },
+    "javascript": {
+        "next.js": {
+            "packages": ["next"],
+            "category": "Full-Stack Framework",
+            "overrides": ["React"]  # Next.js overrides React in detection
+        },
+        "nestjs": {
+            "packages": ["@nestjs/core"],
+            "category": "Backend Framework",
+            "overrides": ["Express"]  # NestJS often uses Express under the hood
+        },
+        "express": {
+            "packages": ["express"],
+            "category": "Backend Framework",
+            "overrides": []
+        },
+        "eeact": {
+            "packages": ["react", "react-dom"],
+            "category": "Frontend Library",
+            "overrides": []
+        }
+    },
+    "php": {
+        "laravel": {
+            "packages": ["laravel/framework"],
+            "category": "Web Framework",
+            "overrides": []
+        }
+    },
+    "ruby": {
+        "rails": {
+            "packages": ["rails"],
+            "category": "Web Framework",
+            "overrides": []
+        }
+    },
+    "java": {
+        "spring boot": {
+            "packages": [
+                "spring-boot-starter-web",
+                "spring-boot-starter",
+                "org.springframework.boot"
+            ],
+            "category": "Backend Framework",
+            "overrides": ["Spring Framework"]
+        },
+        "spring framework": {
+            "packages": [
+                "spring-web",
+                "spring-core",
+                "org.springframework"
+            ],
+            "category": "Backend Framework",
+            "overrides": []
+        }
+    }
+}
+
 DEPENDENCY_MAP = {
     "package.json": {
         "ecosystem": "Node.js",

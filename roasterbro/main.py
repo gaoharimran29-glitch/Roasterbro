@@ -56,7 +56,7 @@ def main():
     print("Test Files:                " , analayze_result['test_files'])
     print("Total test files:          " , len(analayze_result['test_files']))
     print("=================================")
-    print("Dependecies used")
+    print("Dependencies used")
     print("=================================")
     for file , dep in analayze_result['dep'].items():
         print("File:             " , file)
@@ -64,3 +64,6 @@ def main():
         print("Package Manager:  " , dep['package_manager'])
         print("Dependencies:     " , dep['dependencies'])
         print("Dependency Count: " , dep['dep_count'])
+        print("Frameworks:       " , dep['frameworks'])
+        print("Category:         " , dep['category'])
+        print("==============================")

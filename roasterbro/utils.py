@@ -40,7 +40,7 @@ def parse_node(file_path: Path) -> Dict[str , Any]:
             "dependencies": []
         }
     
-    with open(file, 'r', encoding='utf-8' , errors='ignore') as file:
+    with open(file_path, 'r', encoding='utf-8' , errors='ignore') as file:
         try:
             content = json.load(file)
         except json.JSONDecodeError as e:

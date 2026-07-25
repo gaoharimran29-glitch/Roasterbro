@@ -1,6 +1,6 @@
 import os
 import re
-from roasterbro.constants import DEPENDENCY_MAP
+from roasterbro.constants import DEPENDENCY_MAP, FRAMEWORK_SIGNATURES
 
 pattern = r'(==|>=|<=|~=|!=|@)'
 
@@ -23,7 +23,7 @@ def dependencies_analyzer(files: list) -> dict:
         actual_file_path = next((f for f in files if dep_file in f), None)
         if actual_file_path: 
             config = DEPENDENCY_MAP[dep_file] 
-            ecosystem = config.get("ecosystem")
+            ecosystem = config.get("ecosystem").lower()
             lockfile_override = config.get("lockfile_override")
             parser = config.get("handler")
             default_pm = config.get("default_pm")
@@ -39,13 +39,24 @@ def dependencies_analyzer(files: list) -> dict:
             parse_result = parser(actual_file_path)
             dependencies = parse_result.get('dependencies' , [])
             cleaned_dependencies = clean_name(dependencies)
-            
+
+            framework = {}
+            if ecosystem in FRAMEWORK_SIGNATURES.keys():
+                info = FRAMEWORK_SIGNATURES.get(ecosystem, {})
+                for clean_dep in cleaned_dependencies: 
+                    if clean_dep in info:
+                        framework_info = info.get(clean_dep, {})
+                        print(framework_info)
+                        framework.update(framework_info)
+
             dep.update({
                 actual_file_path: {
                     "ecosystem": ecosystem,
                     "package_manager": pm,
                     "dependencies" :  cleaned_dependencies,
-                    "dep_count" : parse_result.get('dependency_count' , 0)
+                    "dep_count" : parse_result.get('dependency_count' , 0),
+                    "frameworks": framework.get("packages"),
+                    "category": framework.get("category"),
                 }
             })
             
