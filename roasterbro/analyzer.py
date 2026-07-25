@@ -4,23 +4,6 @@ from roasterbro.constants import DEPENDENCY_MAP
 
 pattern = r'(==|>=|<=|~=|!=|@)'
 
-"""
-=================================
-Dependecies used
-=================================
-File:              pyproject.toml
-Ecosystem:         Python
-Package Manager:   pip/pyproject
-Dependencies:      ['curl-cffi>=0.15.0', 'datetime>=6.0', 'dnspython>=2.8.0', 'fastmcp>=3.3.1', 'packaging>=26.2', 'pip>=26.1.2', 'pytest==9.0.3', 'python-nmap>=0.7.1', 'python-whois>=0.9.6', 'reportlab>=4.5.1', 'requests>=2.34.2', 'tldextract>=5.3.1']
-Dependency Count:  12
-
-File:              requirements.txt
-Ecosystem:         Python
-Package Manager:   pip
-Dependencies:      ['fastmcp==3.2.4', 'packaging==26.2', 'python-whois==0.9.6', 'python-nmap==0.7.1', 'dnspython==2.8.0', 'trio-websocket==0.12.2', 'websocket-client==1.9.0', 'websockets==16.0', 'requests==2.34.2', 'requests-oauthlib==2.0.0', 'requests-toolbelt==1.0.0', 'pytest==9.0.3', 'curl_cffi==0.15.0', 'tldextract==5.3.1']
-Dependency Count:  14
-"""
-
 def clean_name(dependencies: list) -> list:
     """Clean dependencies name For eg: "curl-cffi>=0.15.0" as a curl-cffi"""
 
