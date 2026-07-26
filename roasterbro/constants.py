@@ -15,7 +15,7 @@ FRAMEWORK_SIGNATURES = {
             "category": "Web Framework",
             "overrides": []
         },
-        "fastaPI": {
+        "fastapi": {
             "packages": ["fastapi"],
             "category": "Web Framework",
             "overrides": []

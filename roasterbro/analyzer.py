@@ -4,14 +4,38 @@ from roasterbro.constants import DEPENDENCY_MAP, FRAMEWORK_SIGNATURES
 
 pattern = r'(==|>=|<=|~=|!=|@)'
 
+"""
+'requirements.txt': {'ecosystem': 'python', 'package_manager': 'pip', 'dependencies': ['yt-dlp', 'langgraph', 'pydantic', 'langchain-groq', 'langchain-core', 'uvicorn', 'groq', 'fastapi', 'django'
+            ], 'dep_count': 9, 'frameworks': {'yt-dlp': {'packages': None, 'category': None, 'overrides': None
+                }, 'langgraph': {'packages': None, 'category': None, 'overrides': None
+                }, 'pydantic': {'packages': None, 'category': None, 'overrides': None
+                }, 'langchain-groq': {'packages': None, 'category': None, 'overrides': None
+                }, 'langchain-core': {'packages': None, 'category': None, 'overrides': None
+                }, 'uvicorn': {'packages': None, 'category': None, 'overrides': None
+                }, 'groq': {'packages': None, 'category': None, 'overrides': None
+                }, 'fastapi': {'packages': ['fastapi'
+                    ], 'category': 'Web Framework', 'overrides': []
+                }, 'django': {'packages': ['django'
+                    ], 'category': 'Web Framework', 'overrides': []
+                }
+            }
+        }
+    }
+}
+"""
+
 def clean_name(dependencies: list) -> list:
     """Clean dependencies name For eg: "curl-cffi>=0.15.0" as a curl-cffi"""
 
     cleaned_dep = []
     for dep in dependencies:
-        parts = re.split(pattern, dep)[0]
-        clean = parts.replace("_" , "-").strip().lower()
-        cleaned_dep.append(clean)
+        if dep.startswith("@"):
+            clean = dep.replace("@" , "" , 1)
+            cleaned_dep.append(clean)
+        else:
+            parts = re.split(pattern, dep)[0]
+            clean = parts.replace("_" , "-").strip().lower()
+            cleaned_dep.append(clean)
 
     return cleaned_dep
 
@@ -40,14 +64,16 @@ def dependencies_analyzer(files: list) -> dict:
             dependencies = parse_result.get('dependencies' , [])
             cleaned_dependencies = clean_name(dependencies)
 
-            framework = {}
-            if ecosystem in FRAMEWORK_SIGNATURES.keys():
-                info = FRAMEWORK_SIGNATURES.get(ecosystem, {})
-                for clean_dep in cleaned_dependencies: 
-                    if clean_dep in info:
-                        framework_info = info.get(clean_dep, {})
-                        print(framework_info)
-                        framework.update(framework_info)
+            framework = []
+            framework_categories = []
+            info = FRAMEWORK_SIGNATURES.get(ecosystem, {})
+            for clean_dep in cleaned_dependencies: 
+                if clean_dep in info:
+                    framework_info = info.get(clean_dep, {})
+                    packages = framework_info.get("packages")
+                    categories = framework_info.get("category")
+                    framework.extend(packages)
+                    framework_categories.append(categories)
 
             dep.update({
                 actual_file_path: {
@@ -55,8 +81,8 @@ def dependencies_analyzer(files: list) -> dict:
                     "package_manager": pm,
                     "dependencies" :  cleaned_dependencies,
                     "dep_count" : parse_result.get('dependency_count' , 0),
-                    "frameworks": framework.get("packages"),
-                    "category": framework.get("category"),
+                    "framework": set(framework),
+                    "framework_categories": set(framework_categories)
                 }
             })
             
