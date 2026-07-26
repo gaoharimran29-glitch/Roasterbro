@@ -4,26 +4,6 @@ from roasterbro.constants import DEPENDENCY_MAP, FRAMEWORK_SIGNATURES
 
 pattern = r'(==|>=|<=|~=|!=|@)'
 
-"""
-'requirements.txt': {'ecosystem': 'python', 'package_manager': 'pip', 'dependencies': ['yt-dlp', 'langgraph', 'pydantic', 'langchain-groq', 'langchain-core', 'uvicorn', 'groq', 'fastapi', 'django'
-            ], 'dep_count': 9, 'frameworks': {'yt-dlp': {'packages': None, 'category': None, 'overrides': None
-                }, 'langgraph': {'packages': None, 'category': None, 'overrides': None
-                }, 'pydantic': {'packages': None, 'category': None, 'overrides': None
-                }, 'langchain-groq': {'packages': None, 'category': None, 'overrides': None
-                }, 'langchain-core': {'packages': None, 'category': None, 'overrides': None
-                }, 'uvicorn': {'packages': None, 'category': None, 'overrides': None
-                }, 'groq': {'packages': None, 'category': None, 'overrides': None
-                }, 'fastapi': {'packages': ['fastapi'
-                    ], 'category': 'Web Framework', 'overrides': []
-                }, 'django': {'packages': ['django'
-                    ], 'category': 'Web Framework', 'overrides': []
-                }
-            }
-        }
-    }
-}
-"""
-
 def clean_name(dependencies: list) -> list:
     """Clean dependencies name For eg: "curl-cffi>=0.15.0" as a curl-cffi"""
 
