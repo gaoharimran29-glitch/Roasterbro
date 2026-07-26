@@ -47,7 +47,7 @@ def dependencies_analyzer(files: list) -> dict:
         actual_file_path = next((f for f in files if dep_file in f), None)
         if actual_file_path: 
             config = DEPENDENCY_MAP[dep_file] 
-            ecosystem = config.get("ecosystem").lower()
+            ecosystem = config.get("ecosystem")
             lockfile_override = config.get("lockfile_override")
             parser = config.get("handler")
             default_pm = config.get("default_pm")
@@ -66,14 +66,21 @@ def dependencies_analyzer(files: list) -> dict:
 
             framework = []
             framework_categories = []
-            info = FRAMEWORK_SIGNATURES.get(ecosystem, {})
-            for clean_dep in cleaned_dependencies: 
-                if clean_dep in info:
-                    framework_info = info.get(clean_dep, {})
-                    packages = framework_info.get("packages")
-                    categories = framework_info.get("category")
-                    framework.extend(packages)
-                    framework_categories.append(categories)
+
+            if isinstance(ecosystem, str):
+                ecosystem = [ecosystem.lower()]
+            if isinstance(ecosystem, list):
+                ecosystem = [x.lower() for x in ecosystem]
+
+            for eco in ecosystem:
+                info = FRAMEWORK_SIGNATURES.get(eco, {})
+                for clean_dep in cleaned_dependencies: 
+                    if clean_dep in info:
+                        framework_info = info.get(clean_dep, {})
+                        packages = framework_info.get("packages")
+                        categories = framework_info.get("category")
+                        framework.extend(packages)
+                        framework_categories.append(categories)
 
             dep.update({
                 actual_file_path: {

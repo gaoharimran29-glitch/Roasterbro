@@ -27,7 +27,7 @@ FRAMEWORK_SIGNATURES = {
         }
     },
     "javascript": {
-        "next.js": {
+        "next": {
             "packages": ["next"],
             "category": "Full-Stack Framework",
             "overrides": ["React"]  # Next.js overrides React in detection
@@ -42,7 +42,7 @@ FRAMEWORK_SIGNATURES = {
             "category": "Backend Framework",
             "overrides": []
         },
-        "eeact": {
+        "react": {
             "packages": ["react", "react-dom"],
             "category": "Frontend Library",
             "overrides": []
@@ -86,7 +86,7 @@ FRAMEWORK_SIGNATURES = {
 
 DEPENDENCY_MAP = {
     "package.json": {
-        "ecosystem": "Node.js",
+        "ecosystem": ['Node.js' , 'Javascript'],
         "default_pm": "npm",
         "lockfile_override": {
             "pnpm-lock.yaml": "pnpm",

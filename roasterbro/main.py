@@ -64,7 +64,7 @@ def main():
         print("Package Manager:    " , dep['package_manager'])
         print("Dependencies:       " , dep['dependencies'])
         print("Total dependencies: " , dep['dep_count'])            
-        print("Frameworks:         " , dep['framework']),
+        print("Frameworks:         " , dep['framework'] if dep['framework'] else {}),
         print("Total Frameworks:   " , len(dep['framework']))
-        print("Category:           " , dep['framework_categories'])
+        print("Category:           " , dep['framework_categories'] if dep['framework_categories'] else {})
         print("==============================")
