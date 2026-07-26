@@ -1,5 +1,6 @@
 from roasterbro.constants import EXCLUDED_FILES , EXTENSION_LANGUAGE_MAP
 import os
+import git
 
 def check_important_files(files : list , directories : list) -> dict[str , bool]:
     """Check whether some basic important files present or not in the repo"""
@@ -37,6 +38,20 @@ def languages_present(files) -> dict[str, int]:
                 detected_languages[language] = 1
                 
     return detected_languages
+
+def analyze_git_repository(path="."):
+    try:
+        git_repo = git.Repo(path, search_parent_directories=True)
+        git_file_path = git_repo.git_dir
+
+        return {
+            "Git Repository": "Yes",
+            "Hidden Git File Path": git_file_path
+        }
+    except git.exc.InvalidGitRepositoryError:
+            return {
+                "Git Repository: No"
+            }
 
 def repo_scan_findings(cwd) -> dict:
     """Analyze the repo and return root repo path , files path and directories the repo"""
