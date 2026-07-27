@@ -1,11 +1,14 @@
 from roasterbro.utils import parse_node , parse_pyproject , parse_requirements , parse_cargo , parse_gomod
 
-EXCLUDED_FILES = [".git", ".svn", ".hg", "venv", ".venv", "env", ".env", "node_modules", 
+EXCLUDED_FILES = [".git", ".svn", ".hg", "venv", ".venv", "node_modules", 
 "site-packages", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache",
 "build", "dist", "roasterbro.egg-info", ".eggs", ".idea", ".vscode", "htmlcov", ".coverage", 
 "_build" , ".pyc", ".pyo", ".pyd", ".so", ".dll", ".exe", ".bin", ".zip", ".tar", ".gz", ".7z", 
 ".rar", ".db", ".sqlite", ".sqlite3", ".log", ".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg", 
 ".webp", ".mp3", ".mp4", ".wav", ".avi", ".ttf", ".woff", ".woff2", ".pdf", ".docx", ".xlsx"]
+
+SUSPICIOUS_PATTERNS = [".env", ".env.local", ".env.production", ".env.dev", ".env.backup",
+"id_rsa", "id_dsa", "private.pem", "private.key", "credentials.json", "service-account.json"]
 
 ## Please add keys and value only in lowercase
 FRAMEWORK_SIGNATURES = {

@@ -1,4 +1,4 @@
-from roasterbro.constants import EXCLUDED_FILES , EXTENSION_LANGUAGE_MAP
+from roasterbro.constants import EXCLUDED_FILES , EXTENSION_LANGUAGE_MAP, SUSPICIOUS_PATTERNS
 import os
 from git import Repo
 from datetime import datetime
@@ -107,6 +107,16 @@ def analyze_git_repository(path: str) -> dict:
             "Error": "Path doesn't exists"
         }
 
+def check_suspicious_file(files: list) -> list:
+    """Check for the suspicious files (e.g. .env ) in the repo"""
+    suspicious_files = []
+    for file in files:
+        f = os.path.normpath(file).lower().replace("\\", "/")
+        if any(pattern in f for pattern in SUSPICIOUS_PATTERNS):
+            suspicious_files.append(f)
+
+    return suspicious_files
+
 def repo_scan_findings(cwd) -> dict:
     """Analyze the repo and return root repo path , files path and directories the repo"""
     root_path = str(cwd)
@@ -123,6 +133,7 @@ def repo_scan_findings(cwd) -> dict:
     imp_files = check_important_files(files , directories)
     language_present = languages_present(files)
     git_analyze_result = analyze_git_repository(cwd)
+    suspicious_files = check_suspicious_file(files)
 
     return {
         "root_path": root_path ,
@@ -130,7 +141,8 @@ def repo_scan_findings(cwd) -> dict:
         "directories": directories ,
         **imp_files ,
         "language_present":language_present,
-        **git_analyze_result
+        **git_analyze_result,
+        "suspicious_files": suspicious_files
     }
 
 def scanner(cwd):

@@ -38,6 +38,8 @@ def main():
     print("CODEOWNERS:            " , "Yes" if scanning_result['CODEOWNER'] else "No")
     print("PULL_REQUEST_TEMPLATE: " , "Yes" if scanning_result['PULL_REQUEST_TEMPLATE'] else "No")
     print("FUNDING.yml:           " , "Yes" if scanning_result['FUNDING.yml'] else "No")
+    print("Suspicious Files:      " , scanning_result['suspicious_files'])
+    print("Total Suspicious Files:" , len(scanning_result['suspicious_files']))
     print("=========================")
     print("Languages Used")
     print("==========================")
