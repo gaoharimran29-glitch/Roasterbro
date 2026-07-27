@@ -2,27 +2,52 @@ from roasterbro.constants import EXCLUDED_FILES , EXTENSION_LANGUAGE_MAP
 import os
 import git
 
-def check_important_files(files : list , directories : list) -> dict[str , bool]:
-    """Check whether some basic important files present or not in the repo"""
-    readme = any(f.lower().startswith("readme") for f in files)
-    _license = any(f.lower().startswith("license") for f in files)
-    dockerfile = any(f.lower() == "dockerfile" for f in files)
-    gitignore = any(f.lower() == ".gitignore" for f in files)
-    has_test = any("test" in d.lower() for d in directories) or any("test" in f.lower() for f in files)
-    contributing = any(f.lower().startswith("contributing") for f in files)
-    changelog = any(f.lower().startswith("changelog") for f in files)
-    ci_cd = any(f.lower().startswith(".github") for f in directories)
-
-    return {
-        "README.md":readme,
-        "LICENSE":_license,
-        "dockerfile":dockerfile,
-        "gitignore":gitignore,
-        "has_test":has_test ,
-        "CONTRIBUTING.md":contributing ,
-        "CHANGELOG.md":changelog ,
-        "CI/CD": ci_cd
+def check_important_files(files: list[str], directories: list[str]) -> dict[str, bool]:
+    """Check whether basic important files and directories are present in the repo."""
+    
+    results = {
+        "README.md": False,
+        "LICENSE": False,
+        "dockerfile": False,
+        "gitignore": False,
+        "has_test": False,
+        "CONTRIBUTING.md": False,
+        "CHANGELOG.md": False,
+        "SECURITY.md": False,
+        "CODE_OF_CONDUCT.md": False,
+        "CI/CD": False,
     }
+
+    for file in files:
+        f = file.lower()
+        if f == "readme.md":
+            results["README.md"] = True
+        elif f == "license":
+            results["LICENSE"] = True
+        elif f == "dockerfile":
+            results["dockerfile"] = True
+        elif f == ".gitignore":
+            results["gitignore"] = True
+        elif f == "contributing.md":
+            results["CONTRIBUTING.md"] = True
+        elif f == "changelog.md":
+            results["CHANGELOG.md"] = True
+        elif f == "security":
+            results["SECURITY.md"] = True
+        elif f == "code_of_conduct.md":
+            results["CODE_OF_CONDUCT.md"] = True
+            
+        if "test" in f:
+            results["has_test"] = True
+
+    for directory in directories:
+        d = directory.lower()
+        if "test" in d:
+            results["has_test"] = True
+        if d == ".github":
+            results["CI/CD"] = True
+
+    return results
 
 def languages_present(files) -> dict[str, int]:
     """Return all unique languages used in the directory."""
