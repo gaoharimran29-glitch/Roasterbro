@@ -74,3 +74,15 @@ def main():
         print("Total Frameworks:   " , len(dep['framework']))
         print("Category:           " , dep['framework_categories'] if dep['framework_categories'] else {})
         print("==============================")
+    print("===================================")
+    print("Git Analyze Result")
+    print("===================================")
+    print("Git Repository:              ", scanning_result.get("Git Repository", False))
+    if scanning_result.get("Git Repository"):
+        print("Git File Path:           ", scanning_result.get("Hidden Git File Path", None))
+        print("Total Contributors:      ", scanning_result.get("Total Contributors", 0))
+        print("Total Commits:           ", scanning_result.get("Total Commits", 0))
+        print("Last Commit date:        ", scanning_result.get("Last Commit date", None))
+        print("Days Since Last Commit:  " , scanning_result.get("Days Since Last Commit", 0))
+    else:
+        print("Error:                   " , scanning_result.get("Error" , "Unknown Error Occured"))
