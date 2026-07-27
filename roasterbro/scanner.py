@@ -16,13 +16,17 @@ def check_important_files(files: list[str], directories: list[str]) -> dict[str,
         "SECURITY.md": False,
         "CODE_OF_CONDUCT.md": False,
         "CI/CD": False,
+        "ISSUE_TEMPLATES": False,
+        "PULL_REQUEST_TEMPLATE": False,
+        "CODEOWNER": False,
+        "FUNDING.yml": False,
     }
 
     for file in files:
-        f = file.lower()
+        f = os.path.normpath(file).lower().replace("\\", "/")
         if f == "readme.md":
             results["README.md"] = True
-        elif f == "license":
+        elif f.startswith("license"):
             results["LICENSE"] = True
         elif f == "dockerfile":
             results["dockerfile"] = True
@@ -32,20 +36,22 @@ def check_important_files(files: list[str], directories: list[str]) -> dict[str,
             results["CONTRIBUTING.md"] = True
         elif f == "changelog.md":
             results["CHANGELOG.md"] = True
-        elif f == "security":
+        elif f == "security.md":
             results["SECURITY.md"] = True
         elif f == "code_of_conduct.md":
             results["CODE_OF_CONDUCT.md"] = True
-            
-        if "test" in f:
-            results["has_test"] = True
-
-    for directory in directories:
-        d = directory.lower()
-        if "test" in d:
-            results["has_test"] = True
-        if d == ".github":
+        elif f.startswith(".github/workflows") or f.startswith(".github/actions"):
             results["CI/CD"] = True
+        elif f.startswith(".github/issue_template"):
+            results["ISSUE_TEMPLATES"] = True
+        elif f.startswith(".github/pull_request_template"):
+            results["PULL_REQUEST_TEMPLATE"] = True
+        elif f == ".github/codeowners":
+            results['CODEOWNER'] = True
+        elif f == ".github/funding.yml":
+            results['FUNDING.yml'] = True     
+        elif "test" in f:
+            results["has_test"] = True
 
     return results
 
