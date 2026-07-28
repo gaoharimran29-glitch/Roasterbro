@@ -3,6 +3,7 @@ import os
 from git import Repo
 from datetime import datetime
 import git
+import click
 
 def check_important_files(files: list[str], directories: list[str]) -> dict[str, bool]:
     """Check whether basic important files and directories are present in the repo."""
@@ -135,6 +136,10 @@ def repo_scan_findings(cwd) -> dict:
     git_analyze_result = analyze_git_repository(cwd)
     suspicious_files = check_suspicious_file(files)
 
+    print("Root Path:         " , root_path)
+    print("Files Found:       " , len(files))
+    print("Directories Found: " , len(directories))
+
     return {
         "root_path": root_path ,
         "files": files ,
@@ -151,3 +156,21 @@ def scanner(cwd):
     print("Scanning...")
     repo_finding = repo_scan_findings(cwd)
     return repo_finding
+
+def repo_scan(cwd) -> dict:
+    """Analyze the repo and return root repo path , files path and directories the repo"""
+    root_path = str(cwd)
+    files = []
+    directories = []
+    for item in cwd.rglob("*"):
+        if any(part in item.parts for part in EXCLUDED_FILES):
+            continue
+        elif item.is_dir():
+            directories.append(str(item.relative_to(cwd)))
+        else:
+            files.append(str(item.relative_to(cwd)))
+
+    click.secho(f"Scanning: {cwd}", fg="cyan", bold=True)
+    click.secho(f"Files Found: {len(files)}" , fg="green")
+    click.secho(f"Directories Found: {len(directories)}" , fg="green")
+    click.echo(click.style("Done!", fg="blue", bold=True))

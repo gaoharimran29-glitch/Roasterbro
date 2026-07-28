@@ -1,4 +1,4 @@
-from roasterbro.scanner import scanner
+from roasterbro.scanner import scanner , repo_scan
 from roasterbro.analyzer import analyze_repo
 from pathlib import Path
 import click
@@ -13,20 +13,41 @@ BANNER = r"""
 │                     | | \ \ (_) | (_| \__ \ ||  __/ |  | |_) | | | (_) |                               │
 │                     |_|  \_\___/ \__,_|___/\__\___|_|  |_.__/|_|  \___/                                │
 │                                                                                                        │
-│                        A CLI to roast your codebase - 0.1.0                                            │
-│                                Made by - Gaohar Imran                                                  │
+│                             A CLI to roast your codebase - 0.1.0                                       │
+│                                     Made by - Gaohar Imran                                             │
 │                                                                                                        │
 ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 """
 
-@click.group(invoke_without_command=True)
+@click.group(context_settings={"help_option_names": ["-h", "--help"]}, invoke_without_command=True)
 @click.version_option("0.1.0", "-v", "--version", prog_name="Roasterbro", message="%(prog)s %(version)s")
 @click.pass_context
 def main(ctx):
     """RoasterBro - A CLI to roast your codebase."""
-    click.secho(BANNER, fg="green", bold=True)
     if ctx.invoked_subcommand is None:
+        click.secho(BANNER, fg="green", bold=True)
         click.echo(ctx.get_help())
+
+@main.command()
+@click.argument("path", required=False, default=None)
+def scan(path):
+    """Scan the basic info of a directory and return root path, files and directories found"""
+    if path is None:
+        click.secho("Nothing specified, nothing added.", fg="red", bold=True)
+        click.secho("hint: Maybe you wanted to say 'roasterbro scan .'?", fg="yellow")
+        raise click.exceptions.Exit(1)
+    
+    cwd = Path(path).resolve()
+
+    if not cwd.exists():
+        click.secho(f"✖ Error: Path doesn't exists -> {cwd}", fg="red", bold=True)
+
+    elif not cwd.is_dir():
+        click.secho(f"✖ Error: It is not a directory -> {cwd}", fg="red", bold=True)
+        raise click.exceptions.Exit(1)
+
+    else:
+        repo_scan(cwd)
 
 """
 def main():
@@ -79,16 +100,7 @@ def main():
     print("===========================")
     for file , loc in analyze_result['file_lines'].items():
         print(f"{file} : {loc} LOC")
-    print("===========================")
-    print("Total LOC:                 " , analyze_result['total_loc'])
-    print("Largest LOC File:          " , analyze_result['largest_loc_file'])
-    print("README LOC:                " , analyze_result['readme_loc'])
-    print("Empty Files:               " , len(analyze_result['empty_files']))
-    print("Files gt than 500 LOC:     " , len(analyze_result['files_gt_500loc']))
-    print("Files gt than 1000 LOC:    " , len(analyze_result['files_gt_1000loc']))
-    print("Average File size:         " , analyze_result['average_file_size'] , "KB")
-    print("Test Files:                " , analyze_result['test_files'])
-    print("Total test files:          " , len(analyze_result['test_files']))
+    
     print("=================================")
     print("Dependencies used")
     print("=================================")
