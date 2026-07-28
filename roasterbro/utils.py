@@ -3,6 +3,25 @@ import tomllib
 import re
 from pathlib import Path
 from typing import Dict, Any, List
+import click
+
+def scan_and_validate(path):
+    if path is None:
+        click.secho("Nothing specified, nothing added.", fg="red", bold=True)
+        click.secho("hint: Maybe you wanted to say 'roasterbro scan .'?", fg="yellow")
+        raise click.exceptions.Exit(1)
+        
+    cwd = Path(path).resolve()
+    
+    if not cwd.exists():
+        click.secho(f"✖ Error: Path doesn't exists -> {cwd}", fg="red", bold=True)
+    
+    elif not cwd.is_dir():
+        click.secho(f"✖ Error: It is not a directory -> {cwd}", fg="red", bold=True)
+        raise click.exceptions.Exit(1)
+    
+    else:
+        return cwd
 
 def parse_requirements(file_path: Path) -> Dict[str , Any]:
     """Parse the requirements.txt file, then extract and return dependencies from it."""

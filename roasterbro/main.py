@@ -1,5 +1,6 @@
 from roasterbro.scanner import scanner , repo_scan
 from roasterbro.analyzer import analyze_repo
+from roasterbro.utils import scan_and_validate
 from pathlib import Path
 import click
 
@@ -31,23 +32,8 @@ def main(ctx):
 @main.command()
 @click.argument("path", required=False, default=None)
 def scan(path):
-    """Scan the basic info of a directory and return root path, files and directories found"""
-    if path is None:
-        click.secho("Nothing specified, nothing added.", fg="red", bold=True)
-        click.secho("hint: Maybe you wanted to say 'roasterbro scan .'?", fg="yellow")
-        raise click.exceptions.Exit(1)
-    
-    cwd = Path(path).resolve()
-
-    if not cwd.exists():
-        click.secho(f"✖ Error: Path doesn't exists -> {cwd}", fg="red", bold=True)
-
-    elif not cwd.is_dir():
-        click.secho(f"✖ Error: It is not a directory -> {cwd}", fg="red", bold=True)
-        raise click.exceptions.Exit(1)
-
-    else:
-        repo_scan(cwd)
+    cwd = scan_and_validate(path)
+    repo_scan(cwd)
 
 """
 def main():
