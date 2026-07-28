@@ -1,7 +1,6 @@
 from roasterbro.scanner import repo_scan_findings, analyze_git_repository, languages_present
 from roasterbro.analyzer import file_metrics, dependencies_analyzer
 from roasterbro.utils import scan_and_validate
-from pathlib import Path
 import click
 
 BANNER = r"""
@@ -299,17 +298,6 @@ def filestats(path):
             click.secho(f"    - {f}", fg="green")
 
     click.secho("─" * 50, fg="bright_black")
-
-"""
-    analyze_result = analyze_repo(scanning_result["files"], scanning_result['has_test'], directories=scanning_result['directories'])
-    print("==========================")
-    print("Deep Analysis")
-    print("==========================")
-    print("File LOC Breakdown")
-    print("===========================")
-    for file , loc in analyze_result['file_lines'].items():
-        print(f"{file} : {loc} LOC")
-"""
 
 if __name__ == "__main__":
     main()
