@@ -3,6 +3,7 @@ import os
 from git import Repo
 from datetime import datetime
 import git
+import re
 
 def check_important_files(files: list[str], directories: list[str]) -> dict[str, bool]:
     """Check whether basic important files and directories are present in the repo."""
@@ -130,6 +131,13 @@ def repo_scan_findings(cwd) -> dict:
         else:
             files.append(str(item.relative_to(cwd)))
 
+    test_keywords = {"test", "tests", "__tests__", "spec", "specs"}
+
+    has_test = (
+    any(d.lower() in test_keywords for d in directories)
+    or any(re.search(r"(^|[_\.\-])(test|spec)s?([_\.\-]|$)", f.lower()) for f in files)
+    )
+
     imp_file = check_important_files(files=files, directories=directories)
     suspicous_file = check_suspicious_file(files=files)
 
@@ -138,5 +146,6 @@ def repo_scan_findings(cwd) -> dict:
         "files":files,
         "directories":directories,
         "imp_file": imp_file,
-        "suspicious_files": suspicous_file
+        "suspicious_files": suspicous_file,
+        "has_test": has_test
     }

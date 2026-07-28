@@ -75,7 +75,7 @@ def dependencies_analyzer(files: list) -> dict:
             
     return dep
             
-def analyze_repo(files: list , has_test: bool , directories: list) -> dict[str , int]:
+def file_metrics(files: list , has_test: bool , directories: list) -> dict[str , int]:
     """Analyze the files of the repo and return deep metrics"""
     file_lines = {}
     file_sizes = {}
@@ -112,20 +112,6 @@ def analyze_repo(files: list , has_test: bool , directories: list) -> dict[str ,
         test_files = [d for d in directories if "test" in d.lower()] +  [d for d in files if "test" in d.lower()]
         test_files_count = len(test_files)
 
-    dependencies_analyze = dependencies_analyzer(files)
-
-    print("File Lines: " , file_lines)
-    print("File Sizes: " , file_sizes)
-    print("Total LOC: " , total_loc)
-    print("Largest LOC File: " , largest_loc_file)
-    print("README LOC: " , readme_loc)
-    print("Empty Files: " , empty_files)
-    print("Files gt than 500 LOC: " , files_gt_500loc)
-    print("Files gt than 1000 LOC: " , files_gt_1000_loc)
-    print("Average File Size: " , average_file_size)
-    print("Test Files: " , test_files)
-    print("Total Test Files: " , test_files_count)
-
     return {
         "file_lines" : file_lines ,
         "file_sizes" : file_sizes ,
@@ -138,6 +124,5 @@ def analyze_repo(files: list , has_test: bool , directories: list) -> dict[str ,
         "largest_file_size" : largest_file_size ,
         "average_file_size" : average_file_size ,
         "test_files" : test_files ,
-        "test_files_count" : test_files_count ,
-        "dep" : dependencies_analyze
+        "test_files_count" : test_files_count
     }
