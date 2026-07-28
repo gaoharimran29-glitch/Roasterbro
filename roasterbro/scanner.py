@@ -57,7 +57,7 @@ def check_important_files(files: list[str], directories: list[str]) -> dict[str,
 
     return results
 
-def languages_present(files) -> dict[str, int]:
+def languages_present(files: list) -> dict[str, int]:
     """Return all unique languages used in the directory."""
     detected_languages = {}
     for filename in files:
