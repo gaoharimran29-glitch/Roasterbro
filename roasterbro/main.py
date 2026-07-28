@@ -1,4 +1,4 @@
-from roasterbro.scanner import scanner , repo_scan
+from roasterbro.scanner import repo_scan_findings
 from roasterbro.analyzer import analyze_repo
 from roasterbro.utils import scan_and_validate
 from pathlib import Path
@@ -33,7 +33,42 @@ def main(ctx):
 @click.argument("path", required=False, default=None)
 def scan(path):
     cwd = scan_and_validate(path)
-    repo_scan(cwd)
+
+    click.secho("")
+    click.secho("─" * 50, fg="bright_black")
+    click.secho(f" 📂 Scanning: ", fg="cyan", bold=True, nl=False)
+    click.secho(f"{cwd}", fg="white")
+
+    scanning_result = repo_scan_findings(cwd)
+
+    click.secho(f" 📄 Files Found: ", fg="cyan", nl=False)
+    click.secho(f"{len(scanning_result.get("files", 0))}", fg="yellow", bold=True)
+    click.secho(f" 📁 Directories Found: ", fg="cyan", nl=False)
+    click.secho(f"{len(scanning_result.get("directories", 0))}", fg="yellow", bold=True)
+    click.secho("─" * 50, fg="bright_black")
+
+    click.secho("\n Project Important Files Checklist", fg="magenta", bold=True, underline=True)
+    click.secho("")
+    
+    imp_files = scanning_result.get("imp_file", {})
+    present_count = sum(1 for v in imp_files.values() if v)
+    total_count = len(imp_files)
+
+    max_len = max(len(name) for name in imp_files)
+
+    for name, present in imp_files.items():
+        symbol = "✔" if present else "✖"
+        color = "green" if present else "red"
+        status = "Found" if present else "Missing"
+        click.secho(f"  {symbol} {name.ljust(max_len)}  ", fg=color, nl=False)
+        click.secho(f"{status}", fg=color, dim=not present)
+
+    click.secho("─" * 50, fg="bright_black")
+    score_color = "green" if present_count == total_count else "yellow" if present_count > total_count // 2 else "red"
+    click.secho(f" Score: ", fg="cyan", nl=False)
+    click.secho(f"{present_count}/{total_count}", fg=score_color, bold=True)
+    click.secho("─" * 50, fg="bright_black")
+    click.secho(" ✅ Done!\n", fg="green", bold=True)
 
 """
 def main():
