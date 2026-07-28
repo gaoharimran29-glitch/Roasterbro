@@ -49,10 +49,8 @@ def scan(path):
 
     click.secho("\n Project Important Files Checklist", fg="magenta", bold=True, underline=True)
     click.secho("")
-    
+
     imp_files = scanning_result.get("imp_file", {})
-    present_count = sum(1 for v in imp_files.values() if v)
-    total_count = len(imp_files)
 
     max_len = max(len(name) for name in imp_files)
 
@@ -64,9 +62,16 @@ def scan(path):
         click.secho(f"{status}", fg=color, dim=not present)
 
     click.secho("─" * 50, fg="bright_black")
-    score_color = "green" if present_count == total_count else "yellow" if present_count > total_count // 2 else "red"
-    click.secho(f" Score: ", fg="cyan", nl=False)
-    click.secho(f"{present_count}/{total_count}", fg=score_color, bold=True)
+
+    click.secho("Suspicious Files", fg="magenta", bold=True, underline=True)
+    suspicious_files = scanning_result.get("suspicious_files", [])
+
+    if not suspicious_files:
+        click.secho("  ✔ No suspicious files found", fg="green")
+    else:
+        for f in suspicious_files:
+            click.secho(f"  ⚠ {f}", fg="red", bold=True)
+
     click.secho("─" * 50, fg="bright_black")
     click.secho(" ✅ Done!\n", fg="green", bold=True)
 

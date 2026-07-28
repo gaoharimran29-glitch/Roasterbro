@@ -131,10 +131,12 @@ def repo_scan_findings(cwd) -> dict:
             files.append(str(item.relative_to(cwd)))
 
     imp_file = check_important_files(files=files, directories=directories)
+    suspicous_file = check_suspicious_file(files=files)
 
     return {
         "root_path":root_path,
         "files":files,
         "directories":directories,
-        "imp_file": imp_file
+        "imp_file": imp_file,
+        "suspicious_files": suspicous_file
     }
