@@ -5,10 +5,10 @@ from pathlib import Path
 from typing import Dict, Any, List
 import click
 
-def scan_and_validate(path):
+def scan_and_validate(path, function_name: str):
     if path is None:
         click.secho("Nothing specified, nothing added.", fg="red", bold=True)
-        click.secho("hint: Maybe you wanted to say 'roasterbro scan .'?", fg="yellow")
+        click.secho(f"hint: Maybe you wanted to say 'roasterbro {function_name} .'?", fg="yellow")
         raise click.exceptions.Exit(1)
         
     cwd = Path(path).resolve()

@@ -1,5 +1,5 @@
 from roasterbro.scanner import repo_scan_findings, analyze_git_repository, languages_present
-from roasterbro.analyzer import analyze_repo
+from roasterbro.analyzer import analyze_repo, dependencies_analyzer
 from roasterbro.utils import scan_and_validate
 from pathlib import Path
 import click
@@ -32,7 +32,7 @@ def main(ctx):
 @main.command()
 @click.argument("path", required=False, default=None)
 def scan(path):
-    cwd = scan_and_validate(path)
+    cwd = scan_and_validate(path, "scan")
 
     click.secho("")
     click.secho("─" * 50, fg="bright_black")
@@ -78,8 +78,8 @@ def scan(path):
 
 @main.command()
 @click.argument("path", required=False, default=None)
-def git_analyze(path):
-    cwd = scan_and_validate(path)
+def gitanalyze(path):
+    cwd = scan_and_validate(path, "gitanalyze")
 
     click.secho("")
     click.secho("─" * 50, fg="bright_black")
@@ -123,8 +123,8 @@ def git_analyze(path):
 
 @main.command()
 @click.argument("path", required=False, default=None)
-def languages(path):
-    cwd = scan_and_validate(path)
+def lang(path):
+    cwd = scan_and_validate(path, "lang")
 
     click.secho("")
     click.secho("─" * 50, fg="bright_black")
@@ -164,6 +164,65 @@ def languages(path):
     click.secho(f"{total} files across {len(languages)} language(s)", fg="green", bold=True)
     click.secho("─" * 50, fg="bright_black")
 
+@main.command()
+@click.argument("path", required=False, default=None)
+def deps(path):
+    cwd = scan_and_validate(path, "deps")
+
+    click.secho("")
+    click.secho("─" * 50, fg="bright_black")
+    click.secho(f"📂 Scanning: ", fg="cyan", bold=True, nl=False)
+    click.secho(f"{cwd}", fg="white")
+
+    scanning_result = repo_scan_findings(cwd)
+    files = scanning_result.get("files", [])
+
+    dep = dependencies_analyzer(files=files)
+    click.secho("\n📦 Dependencies", fg="magenta", bold=True, underline=True)
+
+    if not dep:
+        click.secho("  ✖ No dependency files found", fg="red")
+        click.secho("─" * 50, fg="bright_black")
+        return
+
+    for file_path, info in dep.items():
+        click.secho(f"\n  📄 {file_path}", fg="cyan", bold=True)
+        click.secho(f"    Ecosystem       : ", fg="yellow", nl=False)
+        click.secho(f"{info.get('ecosystem')}", fg="white")
+        click.secho(f"    Package Manager : ", fg="yellow", nl=False)
+        click.secho(f"{info.get('package_manager')}", fg="white")
+
+        dep_count = info.get("dep_count", 0)
+        click.secho(f"    Dependencies    : ", fg="yellow", nl=False)
+        click.secho(f"{dep_count}", fg="green" if dep_count else "red", bold=True)
+
+        frameworks = info.get("framework") or set()
+        click.secho(f"    Framework(s)    : ", fg="yellow", nl=False)
+        if frameworks:
+            click.secho(f"{', '.join(sorted(frameworks))}", fg="blue", bold=True)
+        else:
+            click.secho("None detected", fg="bright_black")
+
+        categories = info.get("framework_categories") or set()
+        click.secho(f"    Categories      : ", fg="yellow", nl=False)
+        if categories:
+            click.secho(f"{', '.join(sorted(categories))}", fg="magenta")
+        else:
+            click.secho("None detected", fg="bright_black")
+
+        deps_list = info.get("dependencies") or []
+        if deps_list:
+            click.secho(f"    Packages:", fg="yellow")
+            for pkg in deps_list:
+                click.secho(f"      • {pkg}", fg="green")
+
+        click.secho("  " + "─" * 46, fg="bright_black")
+
+    click.secho("─" * 50, fg="bright_black")
+    click.secho(f"  Total dependency files: ", fg="cyan", nl=False)
+    click.secho(f"{len(dep)}", fg="green", bold=True)
+    click.secho("─" * 50, fg="bright_black")
+
 """
     analyze_result = analyze_repo(scanning_result["files"], scanning_result['has_test'], directories=scanning_result['directories'])
     print("==========================")
@@ -173,20 +232,6 @@ def languages(path):
     print("===========================")
     for file , loc in analyze_result['file_lines'].items():
         print(f"{file} : {loc} LOC")
-    
-    print("=================================")
-    print("Dependencies used")
-    print("=================================")
-    for file , dep in analyze_result['dep'].items():
-        print("File:               " , file)
-        print("Ecosystem:          " , dep['ecosystem'])
-        print("Package Manager:    " , dep['package_manager'])
-        print("Dependencies:       " , dep['dependencies'])
-        print("Total dependencies: " , dep['dep_count'])            
-        print("Frameworks:         " , dep['framework'] if dep['framework'] else {}),
-        print("Total Frameworks:   " , len(dep['framework']))
-        print("Category:           " , dep['framework_categories'] if dep['framework_categories'] else {})
-        print("==============================")
 """
 
 if __name__ == "__main__":
