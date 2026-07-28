@@ -1,4 +1,4 @@
-from roasterbro.scanner import repo_scan_findings
+from roasterbro.scanner import repo_scan_findings, analyze_git_repository
 from roasterbro.analyzer import analyze_repo
 from roasterbro.utils import scan_and_validate
 from pathlib import Path
@@ -36,14 +36,14 @@ def scan(path):
 
     click.secho("")
     click.secho("─" * 50, fg="bright_black")
-    click.secho(f" 📂 Scanning: ", fg="cyan", bold=True, nl=False)
+    click.secho(f"📂 Scanning: ", fg="cyan", bold=True, nl=False)
     click.secho(f"{cwd}", fg="white")
 
     scanning_result = repo_scan_findings(cwd)
 
-    click.secho(f" 📄 Files Found: ", fg="cyan", nl=False)
+    click.secho(f"📄 Files Found: ", fg="cyan", nl=False)
     click.secho(f"{len(scanning_result.get("files", 0))}", fg="yellow", bold=True)
-    click.secho(f" 📁 Directories Found: ", fg="cyan", nl=False)
+    click.secho(f"📁 Directories Found: ", fg="cyan", nl=False)
     click.secho(f"{len(scanning_result.get("directories", 0))}", fg="yellow", bold=True)
     click.secho("─" * 50, fg="bright_black")
 
@@ -63,8 +63,9 @@ def scan(path):
 
     click.secho("─" * 50, fg="bright_black")
 
-    click.secho("Suspicious Files", fg="magenta", bold=True, underline=True)
+    click.secho("Suspicious Files Found: ", fg="magenta", bold=True, underline=True, nl=False)
     suspicious_files = scanning_result.get("suspicious_files", [])
+    click.secho(f"{len(suspicious_files)}", fg="yellow", bold=True)
 
     if not suspicious_files:
         click.secho("  ✔ No suspicious files found", fg="green")
@@ -73,6 +74,51 @@ def scan(path):
             click.secho(f"  ⚠ {f}", fg="red", bold=True)
 
     click.secho("─" * 50, fg="bright_black")
+    click.secho(" ✅ Done!\n", fg="green", bold=True)
+
+@main.command()
+@click.argument("path", required=False, default=None)
+def git_analyze(path):
+    cwd = scan_and_validate(path)
+
+    click.secho("")
+    click.secho("─" * 50, fg="bright_black")
+    click.secho(f"📂 Scanning: ", fg="cyan", bold=True, nl=False)
+    click.secho(f"{cwd}", fg="white")
+
+    git_info = analyze_git_repository(path)
+
+    if not git_info.get("Git Repository"):
+        click.secho(f"✖ Not a git repository", fg="red", bold=True)
+        click.secho(f"Reason: ", fg="yellow", nl=False)
+        click.secho(f"{git_info.get('Error', 'Unknown')}", fg="white")
+        click.secho("hint: Are you in root of a git repo ?", fg="yellow")
+        click.secho("─" * 50, fg="bright_black")
+
+    else:
+
+        click.secho(f"  ✔ Git repository detected", fg="green", bold=True)
+
+        rows = [
+            ("Hidden Git File Path", git_info.get("Hidden Git File Path")),
+            ("Total Contributors", git_info.get("Total Contributors", 0)),
+            ("Total Commits", git_info.get("Total Commits", 0)),
+            ("Last Commit Date", git_info.get("Last Commit date")),
+            ("Days Since Last Commit", git_info.get("Days Since Last Commit", 0)),
+        ]
+
+        max_len = max(len(label) for label, _ in rows)
+
+        for label, value in rows:
+            click.secho(f"  {label.ljust(max_len)} : ", fg="cyan", nl=False)
+
+            if label == "Days Since Last Commit" and isinstance(value, int):
+                color = "green" if value <= 30 else "yellow" if value <= 180 else "red"
+                click.secho(f"{value} days ago", fg=color, bold=True)
+            else:
+                click.secho(f"{value}", fg="yellow")
+            click.secho("─" * 50, fg="bright_black")
+
     click.secho(" ✅ Done!\n", fg="green", bold=True)
 
 """
