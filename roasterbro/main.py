@@ -1,8 +1,34 @@
-import argparse
 from roasterbro.scanner import scanner
 from roasterbro.analyzer import analyze_repo
 from pathlib import Path
+import click
 
+BANNER = r"""
+╭────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│                                                                                                        │
+│                      _____                 _            _                                              │
+│                     |  __ \               | |          | |                                             │
+│                     | |__) |___   __ _ ___| |_ ___ _ __| |__  _ __ ___                                 │
+│                     |  _  // _ \ / _` / __| __/ _ \ '__| '_ \| '__/ _ \                                │
+│                     | | \ \ (_) | (_| \__ \ ||  __/ |  | |_) | | | (_) |                               │
+│                     |_|  \_\___/ \__,_|___/\__\___|_|  |_.__/|_|  \___/                                │
+│                                                                                                        │
+│                        A CLI to roast your codebase - 0.1.0                                            │
+│                                Made by - Gaohar Imran                                                  │
+│                                                                                                        │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+"""
+
+@click.group(invoke_without_command=True)
+@click.version_option("0.1.0", "-v", "--version", prog_name="Roasterbro", message="%(prog)s %(version)s")
+@click.pass_context
+def main(ctx):
+    """RoasterBro - A CLI to roast your codebase."""
+    click.secho(BANNER, fg="green", bold=True)
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
+
+"""
 def main():
 
     print("Welcome to RoasterBro !")
@@ -88,3 +114,7 @@ def main():
         print("Days Since Last Commit:  " , scanning_result.get("Days Since Last Commit", 0))
     else:
         print("Error:                   " , scanning_result.get("Error" , "Unknown Error Occured"))
+"""
+
+if __name__ == "__main__":
+    main()
