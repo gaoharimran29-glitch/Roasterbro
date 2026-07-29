@@ -52,7 +52,7 @@ def scan(path):
 @click.argument("path", required=False, default=None)
 def gitanalyze(path):
     cwd = scan_and_validate(path, "gitanalyze")
-    git_info = analyze_git_repository(path)
+    git_info = analyze_git_repository(cwd)
     print_git_output(git_info)
 
 
@@ -87,6 +87,29 @@ def filestats(path):
     stats = file_metrics(files=files, has_test=has_test, directories=directories)
     print_filestats_output(stats)
 
+
+@main.command()
+@click.argument("path", required=False, default=None)
+def fullscan(path):
+    cwd = scan_and_validate(path, "filemetrics")
+    scanning_result = repo_scan_findings(cwd)
+    print_scan_output(scanning_result)
+
+    files = scanning_result.get("files", [])
+    languages = languages_present(files=files)
+    print_lang_output(languages)
+
+    dep = dependencies_analyzer(files=files)
+    print_dep_output(dep)
+
+    directories = scanning_result.get("directories" , [])
+    has_test = scanning_result.get("has_test", False)
+    stats = file_metrics(files=files, has_test=has_test, directories=directories)
+    print_filestats_output(stats)
+    
+    git_info = analyze_git_repository(cwd)
+    print_git_output(git_info)
+    
 
 if __name__ == "__main__":
     main()

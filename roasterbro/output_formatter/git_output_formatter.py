@@ -1,7 +1,7 @@
 import click
 
 def print_git_output(git_info: dict):
-
+    click.secho("")
     if not git_info.get("Git Repository"):
         click.secho(f"✖ Not a git repository", fg="red", bold=True)
         click.secho(f"Reason: ", fg="yellow", nl=False)
