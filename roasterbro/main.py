@@ -5,6 +5,7 @@ from roasterbro.tools.repo_deps_scan import dependencies_analyzer
 from roasterbro.tools.repo_file_scan import file_metrics
 from roasterbro.tools.repo_git_scan import analyze_git_repository
 from roasterbro.tools.repo_lang_scan import languages_present
+from roasterbro.tools.repo_roast_scan import full_scan_for_roast, generate_roast
 
 from roasterbro.output_formatter.scan_output_formatter import print_scan_output
 from roasterbro.output_formatter.git_output_formatter import print_git_output
@@ -106,10 +107,16 @@ def fullscan(path):
     has_test = scanning_result.get("has_test", False)
     stats = file_metrics(files=files, has_test=has_test, directories=directories)
     print_filestats_output(stats)
-    
+
     git_info = analyze_git_repository(cwd)
     print_git_output(git_info)
-    
+
+@main.command()
+@click.argument("path", required=False, default=None)
+def roast(path):
+    cwd = scan_and_validate(path, "filemetrics")
+    result = full_scan_for_roast(cwd)
+    generate_roast(result)
 
 if __name__ == "__main__":
     main()
