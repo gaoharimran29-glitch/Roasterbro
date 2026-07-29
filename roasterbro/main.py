@@ -1,7 +1,10 @@
-from roasterbro.scanner import repo_scan_findings, analyze_git_repository, languages_present
-from roasterbro.analyzer import file_metrics, dependencies_analyzer
-from roasterbro.utils import scan_and_validate
 import click
+from roasterbro.utils.helpers import scan_and_validate
+from roasterbro.tools.repo_basic_scan import repo_scan_findings
+from roasterbro.tools.repo_deps_scan import dependencies_analyzer
+from roasterbro.tools.repo_file_scan import file_metrics
+from roasterbro.tools.repo_git_scan import analyze_git_repository
+from roasterbro.tools.repo_lang_scan import languages_present
 
 BANNER = r"""
 ╭────────────────────────────────────────────────────────────────────────────────────────────────────────╮

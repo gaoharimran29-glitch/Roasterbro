@@ -1,11 +1,8 @@
-from roasterbro.constants import EXCLUDED_FILES , EXTENSION_LANGUAGE_MAP, SUSPICIOUS_PATTERNS
 import os
-from git import Repo
-from datetime import datetime
-import git
 import re
+from roasterbro.utils.constants import EXCLUDED_FILES, SUSPICIOUS_PATTERNS
 
-def check_important_files(files: list[str], directories: list[str]) -> dict[str, bool]:
+def check_important_files(files: list[str]) -> dict[str, bool]:
     """Check whether basic important files and directories are present in the repo."""
     
     results = {
@@ -58,56 +55,6 @@ def check_important_files(files: list[str], directories: list[str]) -> dict[str,
 
     return results
 
-def languages_present(files: list) -> dict[str, int]:
-    """Return all unique languages used in the directory."""
-    detected_languages = {}
-    for filename in files:
-        _, ext = os.path.splitext(filename)
-        ext = ext.lower()
-        if ext in EXTENSION_LANGUAGE_MAP:
-            language = EXTENSION_LANGUAGE_MAP[ext]
-            if language in detected_languages:
-                detected_languages[language] += 1
-            else:
-                detected_languages[language] = 1
-                
-    return detected_languages
-
-def analyze_git_repository(path: str) -> dict:
-    """Analyze hidden git file and return git related metadata"""
-    try:
-        git_repo = Repo(path, search_parent_directories=True)
-        git_file_path = git_repo.git_dir
-        commit_count = git_repo.git.rev_list('--count' , 'HEAD')
-        last_commit = git_repo.head.commit.committed_date
-        last_commit_date = datetime.fromtimestamp(last_commit)
-        human_readable_date = last_commit_date.strftime("%B %d, %Y, at %I:%M %p")
-        unique_contributors_count = len(git_repo.git.shortlog("-sn", "HEAD").splitlines())
-
-        today = datetime.now()
-        age_diff = today - last_commit_date
-        days_ago = age_diff.days
-
-        return {
-            "Git Repository": True,
-            "Hidden Git File Path": git_file_path,
-            "Total Contributors": unique_contributors_count,
-            "Total Commits": commit_count,
-            "Last Commit date": human_readable_date,
-            "Days Since Last Commit": days_ago
-        }
-    
-    except git.exc.InvalidGitRepositoryError:
-        return {
-            "Git Repository": False,
-            "Error": "No git file detected"
-        }
-    except git.exc.NoSuchPathError:
-        return {
-            "Git Repository": False,
-            "Error": "Path doesn't exists"
-        }
-
 def check_suspicious_file(files: list) -> list:
     """Check for the suspicious files (e.g. .env ) in the repo"""
     suspicious_files = []
@@ -138,7 +85,7 @@ def repo_scan_findings(cwd) -> dict:
     or any(re.search(r"(^|[_\.\-])(test|spec)s?([_\.\-]|$)", f.lower()) for f in files)
     )
 
-    imp_file = check_important_files(files=files, directories=directories)
+    imp_file = check_important_files(files=files)
     suspicous_file = check_suspicious_file(files=files)
 
     return {
