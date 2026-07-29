@@ -29,7 +29,8 @@ def main(ctx):
     """RoasterBro - A CLI to roast your codebase."""
     if ctx.invoked_subcommand is None:
         click.secho(BANNER, fg="green", bold=True)
-        click.echo(ctx.get_help())
+        click.secho("For more information check the repository https://github.com/gaoharimran29-glitch/Roasterbro or contact the developer. " \
+        "Please report if any bug or vulnerability found to the developer. For help, use 'roasterbro --help' or 'roasterbro -h' .", fg="magenta", bold=True, underline=True)
 
 @main.command()
 @click.argument("path", required=False, default=None)
