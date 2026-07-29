@@ -1,5 +1,6 @@
 import os
 import re
+import click
 from roasterbro.utils.constants import EXCLUDED_FILES, SUSPICIOUS_PATTERNS
 
 def check_important_files(files: list[str]) -> dict[str, bool]:
@@ -67,6 +68,12 @@ def check_suspicious_file(files: list) -> list:
 
 def repo_scan_findings(cwd) -> dict:
     """Analyze the repo and return root repo path , files path and directories the repo"""
+
+    click.secho("")
+    click.secho("─" * 50, fg="bright_black")
+    click.secho(f"📂 Scanning: ", fg="cyan", bold=True, nl=False)
+    click.secho(f"{cwd}", fg="white")
+    
     root_path = str(cwd)
     files = []
     directories = []
