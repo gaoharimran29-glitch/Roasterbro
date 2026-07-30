@@ -30,7 +30,49 @@ BANNER = r"""
 ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 """
 
-@click.group(context_settings={"help_option_names": ["-h", "--help"]}, invoke_without_command=True)
+class AliasedGroup(click.Group):
+
+    aliases = {
+        "-s": "scan",
+        "-g": "gitanalyze",
+        "-d": "deps",
+        "-l": "lang",
+        "-fs": "filestats",
+        "-f": "fullscan",
+        "-r": "roast"
+    }
+
+    def get_command(self, ctx, cmd_name):
+        actual_name = self.aliases.get(cmd_name, cmd_name)
+        return click.Group.get_command(self, ctx, actual_name)
+
+    def list_commands(self, ctx):
+        return click.Group.list_commands(self, ctx)
+
+    def format_commands(self, ctx, formatter):
+        rows = []
+        
+        reverse_aliases = {v: k for k, v in self.aliases.items()}
+
+        for subcommand in self.list_commands(ctx):
+            cmd = self.get_command(ctx, subcommand)
+            if cmd is None:
+                continue
+            
+            shortcut = reverse_aliases.get(subcommand)
+            if shortcut:
+                display_name = f"{shortcut}, {subcommand}"
+            else:
+                display_name = subcommand
+                
+            help_text = cmd.get_short_help_str() or ""
+            rows.append((display_name, help_text))
+
+        if rows:
+            with formatter.section("Commands"):
+                formatter.write_dl(rows)
+
+@click.group(context_settings={"help_option_names": ["-h", "--help"], "ignore_unknown_options":True}, invoke_without_command=True, cls=AliasedGroup)
 @click.version_option("0.1.0", "-v", "--version", prog_name="Roasterbro", message="%(prog)s %(version)s")
 @click.pass_context
 def main(ctx):
@@ -44,6 +86,7 @@ def main(ctx):
 @main.command()
 @click.argument("path", required=False, default=None)
 def scan(path):
+    """Return basic info about the repo"""
     cwd = scan_and_validate(path, "scan")
     scanning_result = repo_scan_findings(cwd)
     print_scan_output(scanning_result)
@@ -52,6 +95,7 @@ def scan(path):
 @main.command()
 @click.argument("path", required=False, default=None)
 def gitanalyze(path):
+    """Return git info about the repo"""
     cwd = scan_and_validate(path, "gitanalyze")
     git_info = analyze_git_repository(cwd)
     print_git_output(git_info)
@@ -60,6 +104,7 @@ def gitanalyze(path):
 @main.command()
 @click.argument("path", required=False, default=None)
 def lang(path):
+    """Return all the languages used in the repo"""
     cwd = scan_and_validate(path, "lang")
     scanning_result = repo_scan_findings(cwd)
     files = scanning_result.get("files", [])
@@ -70,6 +115,7 @@ def lang(path):
 @main.command()
 @click.argument("path", required=False, default=None)
 def deps(path):
+    """Return all the dependencies used in the repo"""
     cwd = scan_and_validate(path, "deps")
     scanning_result = repo_scan_findings(cwd)
     files = scanning_result.get("files", [])
@@ -80,6 +126,7 @@ def deps(path):
 @main.command()
 @click.argument("path", required=False, default=None)
 def filestats(path):
+    """Return stats related to files in the repo"""
     cwd = scan_and_validate(path, "filemetrics")
     scanning_result = repo_scan_findings(cwd)
     files = scanning_result.get("files", [])
@@ -92,6 +139,7 @@ def filestats(path):
 @main.command()
 @click.argument("path", required=False, default=None)
 def fullscan(path):
+    """Return combined full scan result"""
     cwd = scan_and_validate(path, "filemetrics")
     scanning_result = repo_scan_findings(cwd)
     print_scan_output(scanning_result)
@@ -114,6 +162,7 @@ def fullscan(path):
 @main.command()
 @click.argument("path", required=False, default=None)
 def roast(path):
+    """Roast the repo"""
     cwd = scan_and_validate(path, "filemetrics")
     result = full_scan_for_roast(cwd)
     generate_roast(result)
