@@ -5,6 +5,7 @@ from roasterbro.tools.repo_git_scan import analyze_git_repository
 from roasterbro.tools.repo_lang_scan import languages_present
 from roasterbro.prompts.roaster_prompt import SYSTEM_PROMPT, USER_PROMPT, FINAL_ROAST_PROMPT
 from roasterbro.utils.config import MODEL
+from roasterbro.output_formatter.roast_output_formatter import print_question, print_roast
 import json
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
@@ -52,7 +53,7 @@ def generate_roast(scan_data: dict):
     prompt = ChatPromptTemplate.from_messages([("system", SYSTEM_PROMPT), ("human", USER_PROMPT)])
 
     messages = prompt.invoke({"scan_data": json.dumps(scan_data, ensure_ascii=False, indent=2)}).to_messages()
-    counter = 0
+    counter = 1
 
     while True:
 
@@ -60,12 +61,12 @@ def generate_roast(scan_data: dict):
 
             messages.append(SystemMessage(content=FINAL_ROAST_PROMPT))            
             final_roast = MODEL.invoke(messages).content
-            print(final_roast)
+            print_roast(final_roast)
 
             break
 
         result = MODEL.invoke(messages).content
-        print(result)
+        print_question(result)
 
         messages.append(AIMessage(content=result))
 
