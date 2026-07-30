@@ -24,8 +24,8 @@ BANNER = r"""
 │                     | | \ \ (_) | (_| \__ \ ||  __/ |  | |_) | | | (_) |                               │
 │                     |_|  \_\___/ \__,_|___/\__\___|_|  |_.__/|_|  \___/                                │
 │                                                                                                        │
-│                             A CLI to roast your codebase - 0.1.0                                       │
-│                                     Made by - Gaohar Imran                                             │
+│                        A CLI to roast and scan your codebase - 0.1.0                                   │
+│                                  Made by - Gaohar Imran                                                │
 │                                                                                                        │
 ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 """
@@ -76,12 +76,17 @@ class AliasedGroup(click.Group):
 @click.version_option("0.1.0", "-v", "--version", prog_name="Roasterbro", message="%(prog)s %(version)s")
 @click.pass_context
 def main(ctx):
-    """RoasterBro - A CLI to roast your codebase."""
+    """RoasterBro - A CLI to roast and scan your codebase."""
     if ctx.invoked_subcommand is None:
         click.secho(BANNER, fg="green", bold=True)
-        click.secho("For more information check the repository https://github.com/gaoharimran29-glitch/Roasterbro or contact the developer. " \
-        "Please report if any bug or vulnerability found to the developer. For help, use 'roasterbro --help' or 'roasterbro -h' .", fg="magenta", bold=True, underline=True)
-
+        click.secho(
+        "For more information, please visit the project repository at "
+        "https://github.com/gaoharimran29-glitch/Roasterbro or reach out to the "
+        "developer directly. If you encounter any bugs or security "
+        "vulnerabilities, kindly report them to the developer. For assistance, "
+        "run 'roasterbro --help' or 'roasterbro -h'.",
+        fg="magenta", bold=True, underline=True
+    )
 
 @main.command()
 @click.argument("path", required=False, default=None)
