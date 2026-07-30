@@ -5,6 +5,10 @@ def print_scan_output(scanning_result: dict):
     click.secho(f"{len(scanning_result.get("files", 0))}", fg="yellow", bold=True)
     click.secho(f"📁 Directories Found: ", fg="cyan", nl=False)
     click.secho(f"{len(scanning_result.get("directories", 0))}", fg="yellow", bold=True)
+    click.secho("📅 Created At: ", fg="cyan", nl=False)
+    click.secho(f"{scanning_result.get("created_at", None)}", fg="yellow", bold=True)
+    click.secho("💾 Total Size: ", fg="cyan", nl=False)
+    click.secho(f"{scanning_result.get("size", 0)} MB", fg="yellow", bold=True)
     click.secho("─" * 50, fg="bright_black")
 
     click.secho("\n Project Important Files Checklist", fg="magenta", bold=True, underline=True)

@@ -1,6 +1,7 @@
 import os
 import re
 import click
+from datetime import datetime
 from roasterbro.utils.constants import EXCLUDED_FILES, SUSPICIOUS_PATTERNS
 
 def check_important_files(files: list[str]) -> dict[str, bool]:
@@ -75,6 +76,13 @@ def repo_scan_findings(cwd) -> dict:
     click.secho(f"{cwd}", fg="white")
     click.secho("─" * 50, fg="bright_black")
     click.secho("")
+
+    stat = cwd.stat()
+
+    created_time = getattr(stat, 'st_birthtime', stat.st_ctime)
+    formatted_date = datetime.fromtimestamp(created_time).strftime('%Y-%m-%d %H:%M:%S')
+    total_bytes = sum(f.stat().st_size for f in cwd.rglob('*') if f.is_file())
+    size_in_mb = total_bytes / (1024 * 1024)
     
     root_path = str(cwd)
     files = []
@@ -101,6 +109,8 @@ def repo_scan_findings(cwd) -> dict:
         "root_path":root_path,
         "files":files,
         "directories":directories,
+        "created_at": formatted_date,
+        "size": round(size_in_mb, 2),
         "imp_file": imp_file,
         "suspicious_files": suspicous_file,
         "has_test": has_test
