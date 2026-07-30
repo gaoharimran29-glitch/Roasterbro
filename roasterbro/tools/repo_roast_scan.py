@@ -5,10 +5,10 @@ from roasterbro.tools.repo_git_scan import analyze_git_repository
 from roasterbro.tools.repo_lang_scan import languages_present
 from roasterbro.prompts.roaster_prompt import SYSTEM_PROMPT, USER_PROMPT, FINAL_ROAST_PROMPT
 from roasterbro.utils.config import MODEL
-from roasterbro.output_formatter.roast_output_formatter import print_question, print_roast
 import json
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+import click
 
 def make_json_safe(obj):
     if isinstance(obj, dict):
@@ -19,6 +19,16 @@ def make_json_safe(obj):
         return [make_json_safe(v) for v in obj]
     else:
         return obj
+
+def stream_and_print(messages, color="white"):
+    full_text = ""
+    for chunk in MODEL.stream(messages):
+        piece = chunk.content
+        if piece:
+            click.secho(piece, fg=color, nl=False)
+            full_text += piece
+    click.echo()  # newline after streaming finishes
+    return full_text
 
 def full_scan_for_roast(cwd):
 
@@ -58,19 +68,44 @@ def generate_roast(scan_data: dict):
     while True:
 
         if counter > 3:
+            conversation_text = "\n\n".join(
+                f"{'AI' if isinstance(m, AIMessage) else 'User'}: {m.content}"
+                for m in messages
+                if isinstance(m, (AIMessage, HumanMessage))
+            )
 
-            messages.append(SystemMessage(content=FINAL_ROAST_PROMPT))            
-            final_roast = MODEL.invoke(messages).content
-            print_roast(final_roast)
+            final_message = [
+                SystemMessage(content=FINAL_ROAST_PROMPT),
+                HumanMessage(content=f"Here is the full conversation do far:\n\n{conversation_text}\n\nNow give the final roast.")
+            ]
 
+            click.echo()
+            click.secho("─" * 50, fg="bright_black")
+            click.secho("🔥 REPO ROAST", fg="red", bold=True)
+            click.secho("─" * 50, fg="bright_black")
+            click.echo()
+
+            stream_and_print(final_message, color="bright_cyan")
+            click.echo()
+            click.secho("─" * 70, fg="red")
             break
 
-        result = MODEL.invoke(messages).content
-        print_question(result)
+        result = stream_and_print(messages, color="bright_cyan")
 
         messages.append(AIMessage(content=result))
 
-        user_input = input("Your Answer: ")
+        click.secho("")
+
+        while True:
+            user_input = click.prompt(click.style("Your Answer", fg="green", bold=True))
+
+            if user_input.lower() in ["a", "b", "c"]:
+                break
+
+            click.secho("")
+            click.secho("ERROR: Choose only from given option", fg="red", bold=True)
+            click.secho("")
+
         messages.append(HumanMessage(content=user_input))
 
         counter += 1

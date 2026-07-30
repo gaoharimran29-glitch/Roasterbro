@@ -73,6 +73,8 @@ def repo_scan_findings(cwd) -> dict:
     click.secho("─" * 50, fg="bright_black")
     click.secho(f"📂 Scanning: ", fg="cyan", bold=True, nl=False)
     click.secho(f"{cwd}", fg="white")
+    click.secho("─" * 50, fg="bright_black")
+    click.secho("")
     
     root_path = str(cwd)
     files = []
