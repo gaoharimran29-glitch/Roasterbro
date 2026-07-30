@@ -1,12 +1,13 @@
-import click
 from roasterbro.tools.repo_basic_scan import repo_scan_findings
 from roasterbro.tools.repo_deps_scan import dependencies_analyzer
 from roasterbro.tools.repo_file_scan import file_metrics
 from roasterbro.tools.repo_git_scan import analyze_git_repository
 from roasterbro.tools.repo_lang_scan import languages_present
-from roasterbro.prompts.roaster_prompt import SYSTEM_PROMPT, USER_PROMPT
+from roasterbro.prompts.roaster_prompt import SYSTEM_PROMPT, USER_PROMPT, FINAL_ROAST_PROMPT
+from roasterbro.utils.config import MODEL
 import json
-import requests
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 
 def make_json_safe(obj):
     if isinstance(obj, dict):
@@ -47,15 +48,28 @@ def full_scan_for_roast(cwd):
 
 def generate_roast(scan_data: dict):
     scan_data = make_json_safe(scan_data)
-    payload = {
-        "model": "llama3.2:3b",
-        "system": SYSTEM_PROMPT,
-        "prompt": f"Repo data:\n{json.dumps(scan_data)}\n\nRoast this repo.",
-        "stream": True,
-    }
-    with requests.post("http://localhost:11434/api/generate", json=payload, stream=True) as r:
-        r.raise_for_status()
-        for line in r.iter_lines():
-            if line:
-                chunk = json.loads(line)
-                print(chunk.get("response", ""), end="", flush=True)
+
+    prompt = ChatPromptTemplate.from_messages([("system", SYSTEM_PROMPT), ("human", USER_PROMPT)])
+
+    messages = prompt.invoke({"scan_data": json.dumps(scan_data, ensure_ascii=False, indent=2)}).to_messages()
+    counter = 0
+
+    while True:
+
+        if counter > 3:
+
+            messages.append(SystemMessage(content=FINAL_ROAST_PROMPT))            
+            final_roast = MODEL.invoke(messages).content
+            print(final_roast)
+
+            break
+
+        result = MODEL.invoke(messages).content
+        print(result)
+
+        messages.append(AIMessage(content=result))
+
+        user_input = input("Your Answer: ")
+        messages.append(HumanMessage(content=user_input))
+
+        counter += 1
