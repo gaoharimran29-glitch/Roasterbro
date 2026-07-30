@@ -42,7 +42,11 @@ def print_filestats_output(stats: dict):
     if empty_files:
         click.secho("  ⚠ Empty Files:", fg="red", bold=True)
         for f in empty_files:
-            click.secho(f"    - {f}", fg="red")
+            if "__init__.py" in f:
+                click.secho(f"    - {f}", fg="red", nl=False)
+                click.secho(" ( likely intentional - package marker )", fg="red")
+            else:
+                click.secho(f"    - {f}", fg="red")
 
     if files_1000:
         click.secho("  ⚠ Files exceeding 1000 LOC:", fg="red", bold=True)
