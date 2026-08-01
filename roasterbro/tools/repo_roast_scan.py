@@ -10,6 +10,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 import click
 from ollama._types import ResponseError
 
+
 def make_json_safe(obj):
     if isinstance(obj, dict):
         return {k: make_json_safe(v) for k, v in obj.items()}
