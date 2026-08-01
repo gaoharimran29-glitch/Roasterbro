@@ -4,11 +4,11 @@ from roasterbro.tools.repo_file_scan import file_metrics
 from roasterbro.tools.repo_git_scan import analyze_git_repository
 from roasterbro.tools.repo_lang_scan import languages_present
 from roasterbro.prompts.roaster_prompt import SYSTEM_PROMPT, USER_PROMPT, FINAL_ROAST_PROMPT
-from roasterbro.utils.config import MODEL
 import json
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 import click
+from ollama._types import ResponseError
 
 def make_json_safe(obj):
     if isinstance(obj, dict):
@@ -20,15 +20,29 @@ def make_json_safe(obj):
     else:
         return obj
 
-def stream_and_print(messages, color="white"):
+
+def stream_and_print(messages, llm, color="white",):
     full_text = ""
-    for chunk in MODEL.stream(messages):
-        piece = chunk.content
-        if piece:
-            click.secho(piece, fg=color, nl=False)
-            full_text += piece
-    click.echo()  # newline after streaming finishes
-    return full_text
+    try:
+        for chunk in llm.stream(messages):
+            piece = chunk.content
+            if piece:
+                click.secho(piece, fg=color, nl=False)
+                full_text += piece
+        click.echo()
+        return full_text
+
+    except ResponseError as e:
+        if e.status_code == 404:
+            click.echo(
+                f"\n❌ Error: The model you requested was not found in Ollama.\n"
+                f"Please make sure it's downloaded using: 'ollama pull <model_name>'", 
+                err=True
+            )
+        else:
+            click.echo(f"\n❌ Ollama Error: {e.error}", err=True)
+        raise click.Abort()
+
 
 def full_scan_for_roast(cwd):
 
@@ -57,7 +71,9 @@ def full_scan_for_roast(cwd):
         "Git Info": git_info
     }
 
-def generate_roast(scan_data: dict):
+
+def generate_roast(scan_data: dict, llm):
+    llm_instance = llm
     scan_data = make_json_safe(scan_data)
 
     prompt = ChatPromptTemplate.from_messages([("system", SYSTEM_PROMPT), ("human", USER_PROMPT)])
@@ -85,12 +101,12 @@ def generate_roast(scan_data: dict):
             click.secho("─" * 50, fg="bright_black")
             click.echo()
 
-            stream_and_print(final_message, color="bright_cyan")
+            stream_and_print(final_message, color="bright_cyan", llm=llm_instance)
             click.echo()
             click.secho("─" * 70, fg="red")
             break
 
-        result = stream_and_print(messages, color="bright_cyan")
+        result = stream_and_print(messages, color="bright_cyan", llm=llm_instance)
 
         messages.append(AIMessage(content=result))
 

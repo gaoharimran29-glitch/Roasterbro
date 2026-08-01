@@ -1,5 +1,6 @@
 import click
 from roasterbro.utils.helpers import scan_and_validate
+from roasterbro.utils.config import get_llm
 from roasterbro.tools.repo_basic_scan import repo_scan_findings
 from roasterbro.tools.repo_deps_scan import dependencies_analyzer
 from roasterbro.tools.repo_file_scan import file_metrics
@@ -164,13 +165,22 @@ def fullscan(path):
     git_info = analyze_git_repository(cwd)
     print_git_output(git_info)
 
+
 @main.command()
 @click.argument("path", required=False, default=None)
-def roast(path):
+@click.option(
+    "--llm", 
+    type=str, 
+    default="llama3.2:3b",
+    help="Specify the Ollama local model to use (e.g., llama3.2:3b)."
+)
+def roast(path, llm):
     """Roast the repo"""
     cwd = scan_and_validate(path, "filemetrics")
+    llm_instance = get_llm(llm)
     result = full_scan_for_roast(cwd)
-    generate_roast(result)
+    generate_roast(result, llm=llm_instance)
+
 
 if __name__ == "__main__":
     main()

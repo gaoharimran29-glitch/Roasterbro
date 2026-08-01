@@ -12,7 +12,8 @@ def print_git_output(git_info: dict):
     else:
 
         click.secho(f"  ✔ Git repository detected", fg="green", bold=True)
-
+        click.secho("")
+        
         rows = [
             ("Hidden Git File Path", git_info.get("Hidden Git File Path")),
             ("Total Contributors", git_info.get("Total Contributors", 0)),
