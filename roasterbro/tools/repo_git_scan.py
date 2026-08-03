@@ -11,6 +11,9 @@ def analyze_git_repository(path: str) -> dict:
         last_commit_date = datetime.fromtimestamp(last_commit)
         human_readable_date = last_commit_date.strftime("%B %d, %Y, at %I:%M %p")
         unique_contributors_count = len(git_repo.git.shortlog("-sn", "HEAD").splitlines())
+        local_branches = git_repo.branches
+        remote_branches = [ref for remote in git_repo.remotes for ref in remote.refs]
+        true_remote_branches = [branch for branch in remote_branches if not branch.name.endswith("/HEAD")]
 
         today = datetime.now()
         age_diff = today - last_commit_date
@@ -22,7 +25,11 @@ def analyze_git_repository(path: str) -> dict:
             "Total Contributors": unique_contributors_count,
             "Total Commits": commit_count,
             "Last Commit date": human_readable_date,
-            "Days Since Last Commit": days_ago
+            "Days Since Last Commit": days_ago,
+            "Local Branches": local_branches,
+            "Remote Branches": true_remote_branches,
+            "No. of local branches": len(local_branches),
+            "No. of remote branches": len(true_remote_branches)
         }
     
     except git.exc.InvalidGitRepositoryError:
