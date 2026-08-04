@@ -38,4 +38,3 @@ def print_scan_output(scanning_result: dict):
             click.secho(f"  ⚠ {f}", fg="red", bold=True)
 
     click.secho("─" * 50, fg="bright_black")
-    click.secho(" ✅ Done!\n", fg="green", bold=True)

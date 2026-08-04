@@ -8,6 +8,7 @@ from roasterbro.tools.repo_deps_scan import dependencies_analyzer
 from roasterbro.tools.repo_file_scan import file_metrics
 from roasterbro.tools.repo_git_scan import analyze_git_repository
 from roasterbro.tools.repo_lang_scan import languages_present
+from roasterbro.tools.repo_whitespace_scan import whitespace_scan
 from roasterbro.tools.repo_roast_scan import full_scan_for_roast, generate_roast, make_json_safe
 
 from roasterbro.output_formatter.scan_output_formatter import print_scan_output
@@ -15,6 +16,7 @@ from roasterbro.output_formatter.git_output_formatter import print_git_output
 from roasterbro.output_formatter.lang_output_formatter import print_lang_output
 from roasterbro.output_formatter.dep_output_formatter import print_dep_output
 from roasterbro.output_formatter.filestats_output_formatter import print_filestats_output
+from roasterbro.output_formatter.whitespace_output_formatter import print_whitespace_output
 
 
 BANNER = r"""
@@ -39,8 +41,9 @@ class AliasedGroup(click.Group):
         "-s": "scan",
         "-g": "gitanalyze",
         "-d": "deps",
-        "-l": "lang",
+        "-l": "langs",
         "-fs": "filestats",
+        "-w": "whitespace",
         "-f": "fullscan",
         "-r": "roast"
     }
@@ -99,6 +102,7 @@ def scan(path):
     cwd = scan_and_validate(path, "scan")
     scanning_result = repo_scan_findings(cwd)
     print_scan_output(scanning_result)
+    click.secho(" ✨ Done!\n", fg="green", bold=True)
 
 
 @main.command()
@@ -108,17 +112,19 @@ def gitanalyze(path):
     cwd = scan_and_validate(path, "gitanalyze")
     git_info = analyze_git_repository(cwd)
     print_git_output(git_info)
+    click.secho(" ✨ Done!\n", fg="green", bold=True)
 
 
 @main.command()
 @click.argument("path", required=False, default=None)
-def lang(path):
+def langs(path):
     """Return all the languages used in the repo"""
     cwd = scan_and_validate(path, "lang")
     scanning_result = repo_scan_findings(cwd)
     files = scanning_result.get("files", [])
     languages = languages_present(files=files)
     print_lang_output(languages)
+    click.secho(" ✨ Done!\n", fg="green", bold=True)
 
 
 @main.command()
@@ -130,6 +136,7 @@ def deps(path):
     files = scanning_result.get("files", [])
     dep = dependencies_analyzer(files=files)
     print_dep_output(dep)
+    click.secho(" ✨ Done!\n", fg="green", bold=True)
 
 
 @main.command()
@@ -143,7 +150,19 @@ def filestats(path):
     has_test = scanning_result.get("has_test", False)
     stats = file_metrics(files=files, has_test=has_test, directories=directories)
     print_filestats_output(stats)
+    click.secho(" ✨ Done!\n", fg="green", bold=True)
 
+
+@main.command()
+@click.argument("path", required=False, default=None)
+def whitespace(path):
+    """Return filename, filenumber if contains a trailing whitespace"""
+    cwd = scan_and_validate(path, "whitespace")
+    scanning_result = repo_scan_findings(cwd)
+    files = scanning_result.get("files", [])
+    whitespaces = whitespace_scan(files)
+    print_whitespace_output(whitespaces)
+    click.secho(" ✨ Done!\n", fg="green", bold=True)
 
 @main.command()
 @click.argument("path", required=False, default=None)
@@ -195,6 +214,8 @@ def fullscan(path, json_path):
 
         except Exception as e:
             click.echo(click.style(f"\n❌ Failed to save JSON file: {e}", fg="red"), err=True)
+
+    click.secho(" ✨ Done!\n", fg="green", bold=True)
 
 
 @main.command()
