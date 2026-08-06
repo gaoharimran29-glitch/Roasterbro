@@ -10,9 +10,9 @@ def check_important_files(files: list[str]) -> dict[str, bool]:
     results = {
         "README.md": False,
         "LICENSE": False,
-        "dockerfile": False,
-        "gitignore": False,
-        "has_test": False,
+        "Dockerfile": False,
+        ".gitignore": False,
+        "Test_Files": False,
         "CONTRIBUTING.md": False,
         "CHANGELOG.md": False,
         "SECURITY.md": False,
@@ -31,9 +31,9 @@ def check_important_files(files: list[str]) -> dict[str, bool]:
         elif f.startswith("license"):
             results["LICENSE"] = True
         elif f == "dockerfile":
-            results["dockerfile"] = True
+            results["Dockerfile"] = True
         elif f == ".gitignore":
-            results["gitignore"] = True
+            results[".gitignore"] = True
         elif f == "contributing.md":
             results["CONTRIBUTING.md"] = True
         elif f == "changelog.md":
@@ -53,7 +53,7 @@ def check_important_files(files: list[str]) -> dict[str, bool]:
         elif f == ".github/funding.yml":
             results['FUNDING.yml'] = True     
         elif "test" in f:
-            results["has_test"] = True
+            results["Test_Files"] = True
 
     return results
 

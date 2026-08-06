@@ -164,6 +164,7 @@ def whitespace(path):
     print_whitespace_output(whitespaces)
     click.secho(" ✨ Done!\n", fg="green", bold=True)
 
+
 @main.command()
 @click.argument("path", required=False, default=None)
 @click.option(

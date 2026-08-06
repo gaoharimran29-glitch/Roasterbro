@@ -9,7 +9,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 import click
 from ollama._types import ResponseError
-
+from git import Head
 
 def make_json_safe(obj):
     if isinstance(obj, dict):
@@ -18,6 +18,8 @@ def make_json_safe(obj):
         return list(obj)
     elif isinstance(obj, list):
         return [make_json_safe(v) for v in obj]
+    elif isinstance(obj, Head):
+        return str(obj)
     else:
         return obj
 
