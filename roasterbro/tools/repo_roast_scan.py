@@ -10,6 +10,7 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 import click
 from ollama._types import ResponseError
 from git import Head
+from roasterbro.models.roast_output_model import RagebaitResponse, FinalRoast
 
 def make_json_safe(obj):
     if isinstance(obj, dict):
@@ -22,29 +23,6 @@ def make_json_safe(obj):
         return str(obj)
     else:
         return obj
-
-
-def stream_and_print(messages, llm, color="white",):
-    full_text = ""
-    try:
-        for chunk in llm.stream(messages):
-            piece = chunk.content
-            if piece:
-                click.secho(piece, fg=color, nl=False)
-                full_text += piece
-        click.echo()
-        return full_text
-
-    except ResponseError as e:
-        if e.status_code == 404:
-            click.echo(
-                f"\n❌ Error: The model you requested was not found in Ollama.\n"
-                f"Please make sure it's downloaded using: 'ollama pull <model_name>'", 
-                err=True
-            )
-        else:
-            click.echo(f"\n❌ Ollama Error: {e.error}", err=True)
-        raise click.Abort()
 
 
 def full_scan_for_roast(cwd):
@@ -75,56 +53,66 @@ def full_scan_for_roast(cwd):
     }
 
 
-def generate_roast(scan_data: dict, llm):
-    llm_instance = llm
+async def generate_roast(scan_data: dict, llm):
     scan_data = make_json_safe(scan_data)
+    
+    structured_llm_questions = llm.with_structured_output(RagebaitResponse)
+    structured_llm_roast = llm.with_structured_output(FinalRoast)
 
     prompt = ChatPromptTemplate.from_messages([("system", SYSTEM_PROMPT), ("human", USER_PROMPT)])
+    messages = await prompt.ainvoke({"scan_data": json.dumps(scan_data, ensure_ascii=False, indent=2)}).to_messages()
 
-    messages = prompt.invoke({"scan_data": json.dumps(scan_data, ensure_ascii=False, indent=2)}).to_messages()
-    counter = 1
+    click.secho("🤖 Generating interrogation questions...", fg="yellow")
+    try:
+        structured_response: RagebaitResponse = await structured_llm_questions.ainvoke(messages)
+    except Exception as e:
+        click.secho(f"\n❌ Validation Error: Local model failed to match JSON schema. {e}", fg="red", bold=True)
+        raise click.Abort()
 
-    while True:
+    interrogation_history = []
 
-        if counter > 3:
-            conversation_text = "\n\n".join(
-                f"{'AI' if isinstance(m, AIMessage) else 'User'}: {m.content}"
-                for m in messages
-                if isinstance(m, (AIMessage, HumanMessage))
-            )
-
-            final_message = [
-                SystemMessage(content=FINAL_ROAST_PROMPT),
-                HumanMessage(content=f"Here is the full conversation do far:\n\n{conversation_text}\n\nNow give the final roast.")
-            ]
-
-            click.echo()
-            click.secho("─" * 50, fg="bright_black")
-            click.secho("🔥 REPO ROAST", fg="red", bold=True)
-            click.secho("─" * 50, fg="bright_black")
-            click.echo()
-
-            stream_and_print(final_message, color="bright_cyan", llm=llm_instance)
-            click.echo()
-            click.secho("─" * 70, fg="red")
-            break
-
-        result = stream_and_print(messages, color="bright_cyan", llm=llm_instance)
-
-        messages.append(AIMessage(content=result))
-
-        click.secho("")
+    for idx, q_item in enumerate(structured_response.questions, start=1):
+        click.echo()
+        click.secho(f"❓ Question {idx}: {q_item.question}", fg="bright_cyan", bold=True)
+        
+        tags = ["A", "B", "C"]
+        for tag, option in zip(tags, q_item.options):
+            click.secho(f"   [{tag}] {option}", fg="bright_cyan")
+        click.echo()
 
         while True:
-            user_input = click.prompt(click.style("Your Answer", fg="green", bold=True))
-
-            if user_input.lower() in ["a", "b", "c"]:
+            user_input = click.prompt(click.style("Your Answer (A/B/C)", fg="green", bold=True)).strip().upper()
+            if user_input in tags:
+                selected_option_text = q_item.options[tags.index(user_input)]
                 break
+            
+            click.echo()
+            click.secho("ERROR: Choose only from given options (A, B, or C)", fg="red", bold=True)
+            click.echo()
 
-            click.secho("")
-            click.secho("ERROR: Choose only from given option", fg="red", bold=True)
-            click.secho("")
+        interrogation_history.append(f"Question: {q_item.question}")
+        interrogation_history.append(f"User selected Option {user_input}: {selected_option_text}")
 
-        messages.append(HumanMessage(content=user_input))
+    conversation_text = "\n".join(interrogation_history)
+    
+    final_messages = [
+        SystemMessage(content=FINAL_ROAST_PROMPT),
+        HumanMessage(content=f"Here is the data from the interrogation session:\n\n{conversation_text}\n\nNow give the final roast based on this.")
+    ]
 
-        counter += 1
+    click.echo()
+    click.secho("─" * 50, fg="bright_black")
+    click.secho("🔥 REPO ROAST", fg="red", bold=True)
+    click.secho("─" * 50, fg="bright_black")
+    click.echo()
+
+    try:
+        final_roast_obj: FinalRoast = await structured_llm_roast.ainvoke(final_messages)
+        click.secho(final_roast_obj.roast, fg="bright_red")
+
+    except Exception as e:
+        click.secho(f"\n❌ Error generating final structured roast: {e}", fg="red")
+        raise click.Abort()
+
+    click.echo()
+    click.secho("─" * 70, fg="red")

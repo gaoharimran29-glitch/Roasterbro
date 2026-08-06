@@ -43,6 +43,8 @@ B) ...
 C) ...
 
 Only output the next question.
+
+Use the structured model to generate the output
 """
 
 USER_PROMPT = """
@@ -85,4 +87,5 @@ RULES:
 12. Never repeat repository statistics like a report. Turn facts into jokes.
 
 The roast should feel personal because of the answers given during interrogation.
+Use the structured model to generate the output
 """
