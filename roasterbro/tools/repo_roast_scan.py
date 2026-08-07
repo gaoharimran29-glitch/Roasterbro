@@ -1,16 +1,20 @@
+import json
+import click
+from git import Head
+from langchain_core.prompts import ChatPromptTemplate
+
 from roasterbro.tools.repo_basic_scan import repo_scan_findings
 from roasterbro.tools.repo_deps_scan import dependencies_analyzer
 from roasterbro.tools.repo_file_scan import file_metrics
 from roasterbro.tools.repo_git_scan import analyze_git_repository
 from roasterbro.tools.repo_lang_scan import languages_present
-from roasterbro.prompts.roaster_prompt import SYSTEM_PROMPT, USER_PROMPT, FINAL_ROAST_PROMPT
-import json
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
-import click
-from ollama._types import ResponseError
-from git import Head
-from roasterbro.models.roast_output_model import RagebaitResponse, FinalRoast
+
+from roasterbro.prompts.final_roast_prompt import FINAL_ROAST_SYSTEM_PROMPT, FINAL_ROAST_USER_PROMPT
+from roasterbro.prompts.facts_extract_prompt import EXTRACT_SYSTEM_PROMPT, EXTRACT_USER_PROMPT
+from roasterbro.prompts.questions_generate_prompt import QUESTION_SYSTEM_PROMPT, QUESTION_USER_PROMPT
+
+from roasterbro.models.roast_output_model import RagebaitResponse, FinalRoast, RepoFacts
+from langsmith import traceable
 
 def make_json_safe(obj):
     if isinstance(obj, dict):
@@ -53,36 +57,59 @@ def full_scan_for_roast(cwd):
     }
 
 
+@traceable(name="Roasterbro")
 async def generate_roast(scan_data: dict, llm):
     scan_data = make_json_safe(scan_data)
-    
+
+    structured_llm_facts = llm.with_structured_output(RepoFacts)
     structured_llm_questions = llm.with_structured_output(RagebaitResponse)
     structured_llm_roast = llm.with_structured_output(FinalRoast)
 
-    prompt = ChatPromptTemplate.from_messages([("system", SYSTEM_PROMPT), ("human", USER_PROMPT)])
-    prompt_value = await prompt.ainvoke({"scan_data": json.dumps(scan_data, ensure_ascii=False, indent=2)})
-    messages = prompt_value.to_messages()
+    click.secho("🥱 Digging through your repo for ammo...", fg="yellow")
+    click.secho("")
+    prompt_facts = ChatPromptTemplate.from_messages([("system", EXTRACT_SYSTEM_PROMPT), ("human", EXTRACT_USER_PROMPT)])
+    prompt_facts_value = await prompt_facts.ainvoke({"scan_data": json.dumps(scan_data, ensure_ascii=False, indent=2)})
+    messages_facts = prompt_facts_value.to_messages()
 
-    click.secho("🤖 Generating interrogation questions...", fg="yellow")
     try:
-        structured_response: RagebaitResponse = await structured_llm_questions.ainvoke(messages)
+        generated_facts: RepoFacts = await structured_llm_facts.ainvoke(messages_facts)
     except Exception as e:
+        click.secho(f"\n❌ Analysis Failed.", fg="red", bold=True)
+        click.secho(f"\n❌ Validation Error: Local model failed to match JSON schema. {e}", fg="red", bold=True)
+        raise click.exceptions.Exit(1)
+
+    click.secho("😈 Cooking up some questions for you, bro...", fg="yellow")
+
+    prompt_questions = ChatPromptTemplate.from_messages([("system", QUESTION_SYSTEM_PROMPT), ("human", QUESTION_USER_PROMPT)])
+    prompt_questions_value = await prompt_questions.ainvoke({"facts": generated_facts.facts})
+    messages_questions = prompt_questions_value.to_messages()
+
+    try:
+        generate_questions: RagebaitResponse = await structured_llm_questions.ainvoke(messages_questions)
+    except Exception as e:
+        click.secho("Taunts Generation Failed", fg="red", bold=True)
         click.secho(f"\n❌ Validation Error: Local model failed to match JSON schema. {e}", fg="red", bold=True)
         raise click.exceptions.Exit(1)
 
     interrogation_history = []
 
-    for idx, q_item in enumerate(structured_response.questions, start=1):
+    for idx, q_item in enumerate(generate_questions.questions, start=1):
         click.echo()
-        click.secho(f"❓ Question {idx}: {q_item.question}", fg="bright_cyan", bold=True)
+        click.secho(f"❓ Question {idx}/{len(generate_questions.questions)}: {q_item.question}", fg="bright_cyan", bold=True)
         
-        tags = ["A", "B", "C"]
+        tags = [chr(65 + i) for i in range(len(q_item.options))]
         for tag, option in zip(tags, q_item.options):
-            click.secho(f"{option}", fg="bright_cyan")
+            click.secho(f"({tag}) {option}", fg="bright_cyan")
         click.echo()
 
         while True:
-            user_input = click.prompt(click.style("Your Answer (A/B/C)", fg="green", bold=True)).strip().upper()
+            try:
+                user_input = click.prompt(click.style("Your Answer (A/B/C)", fg="green", bold=True)).strip().upper()
+            except click.exceptions.Abort:
+                click.echo()
+                click.secho("✖ Roast aborted. Coward.", fg="red")
+                raise click.exceptions.Exit(1)
+            
             if user_input in tags:
                 selected_option_text = q_item.options[tags.index(user_input)]
                 break
@@ -95,24 +122,27 @@ async def generate_roast(scan_data: dict, llm):
         interrogation_history.append(f"User selected Option {user_input}: {selected_option_text}")
 
     conversation_text = "\n".join(interrogation_history)
-    
-    final_messages = [
-        SystemMessage(content=FINAL_ROAST_PROMPT),
-        HumanMessage(content=f"Here is the data from the interrogation session:\n\n{conversation_text}\n\nNow give the final roast based on this.")
-    ]
 
+    prompt_roast = ChatPromptTemplate.from_messages([("system", FINAL_ROAST_SYSTEM_PROMPT), ("human", FINAL_ROAST_USER_PROMPT)])
+    prompt_roast_value = await prompt_roast.ainvoke({"facts": generated_facts.facts, "qa_pairs":conversation_text})
+    messages_roast = prompt_roast_value.to_messages()
+
+    click.secho("")
+    click.secho("💀 Drafting my closing statement on this crime scene...", fg="yellow")
     click.echo()
     click.secho("─" * 50, fg="bright_black")
-    click.secho("🔥 REPO ROAST", fg="red", bold=True)
+    click.secho("🔥 REPO ROAST — don't take it personal, bro 🔥", fg="red", bold=True)
     click.secho("─" * 50, fg="bright_black")
     click.echo()
 
     try:
-        final_roast_obj: FinalRoast = await structured_llm_roast.ainvoke(final_messages)
+        final_roast_obj: FinalRoast = await structured_llm_roast.ainvoke(messages_roast)
         click.secho(final_roast_obj.roast, fg="bright_cyan")
+        click.secho("")
+        click.secho(f"💀 {final_roast_obj.mic_drop_line}", fg="red", bold=True)
 
     except Exception as e:
-        click.secho(f"\n❌ Error generating final structured roast: {e}", fg="red")
+        click.secho(f"\n❌ Final roast not generated: {e}", fg="red")
         raise click.exceptions.Exit(1)
 
     click.echo()

@@ -236,14 +236,14 @@ def models():
 @click.option(
     "--provider", 
     type=str, 
-    default="ollama",
-    help="Specify the LLM Model provider company (e.g., ollama)"
+    default="google",
+    help="Specify the LLM Model provider company (e.g., google)"
 )
 @click.option(
     "--llm", 
     type=str, 
-    default="llama3.2:3b",
-    help="Specify the LLM model to use (e.g., llama3.2:3b)."
+    default="gemini-2.5-flash-lite",
+    help="Specify the LLM model to use (e.g., gemini-2.5-flash-lite)."
 )
 def roast(path, llm, provider):
     """Roast the repo"""
