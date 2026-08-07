@@ -11,6 +11,7 @@ from roasterbro.tools.repo_git_scan import analyze_git_repository
 from roasterbro.tools.repo_lang_scan import languages_present
 from roasterbro.tools.repo_whitespace_scan import whitespace_scan
 from roasterbro.tools.repo_roast_scan import full_scan_for_roast, generate_roast, make_json_safe
+from roasterbro.tools.find_llm_models import find_models
 
 from roasterbro.output_formatter.scan_output_formatter import print_scan_output
 from roasterbro.output_formatter.git_output_formatter import print_git_output
@@ -18,6 +19,7 @@ from roasterbro.output_formatter.lang_output_formatter import print_lang_output
 from roasterbro.output_formatter.dep_output_formatter import print_dep_output
 from roasterbro.output_formatter.filestats_output_formatter import print_filestats_output
 from roasterbro.output_formatter.whitespace_output_formatter import print_whitespace_output
+from roasterbro.output_formatter.model_output_formatter import print_model_output
 
 
 BANNER = r"""
@@ -46,6 +48,7 @@ class AliasedGroup(click.Group):
         "-fs": "filestats",
         "-w": "whitespace",
         "-f": "fullscan",
+        "-m": "models",
         "-r": "roast"
     }
 
@@ -221,12 +224,26 @@ def fullscan(path, json_path):
 
 
 @main.command()
+def models():
+    """To detect the local repo and cloud provider api keys"""
+    result = find_models()
+    print_model_output(result)
+    click.secho(" ✨ Done!\n", fg="green", bold=True)
+
+
+@main.command()
 @click.argument("path", required=False, default=None)
+@click.option(
+    "--provider", 
+    type=str, 
+    default="ollama",
+    help="Specify the LLM Model provider company (e.g., ollama)"
+)
 @click.option(
     "--llm", 
     type=str, 
     default="llama3.2:3b",
-    help="Specify the Ollama local model to use (e.g., llama3.2:3b)."
+    help="Specify the LLM model to use (e.g., llama3.2:3b)."
 )
 def roast(path, llm):
     """Roast the repo"""
