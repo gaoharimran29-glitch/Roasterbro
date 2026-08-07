@@ -5,7 +5,8 @@ def get_llm(model_name: str):
     """Create the ollama llm model instance"""
     try:
         MODEL = ChatOllama(model=model_name,
-            temperature=0.7,
+            temperature=0.9,
+            top_p=0.95,
             base_url="http://localhost:11434"
         )
 

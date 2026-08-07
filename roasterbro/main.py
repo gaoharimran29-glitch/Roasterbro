@@ -1,5 +1,6 @@
 import click
 import json
+import asyncio
 
 from roasterbro.utils.helpers import scan_and_validate
 from roasterbro.utils.config import get_llm
@@ -232,7 +233,7 @@ def roast(path, llm):
     cwd = scan_and_validate(path, "filemetrics")
     llm_instance = get_llm(llm)
     result = full_scan_for_roast(cwd)
-    generate_roast(result, llm=llm_instance)
+    asyncio.run(generate_roast(result, llm=llm_instance))
 
 
 if __name__ == "__main__":

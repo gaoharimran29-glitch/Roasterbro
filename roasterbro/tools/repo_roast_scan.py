@@ -60,7 +60,8 @@ async def generate_roast(scan_data: dict, llm):
     structured_llm_roast = llm.with_structured_output(FinalRoast)
 
     prompt = ChatPromptTemplate.from_messages([("system", SYSTEM_PROMPT), ("human", USER_PROMPT)])
-    messages = await prompt.ainvoke({"scan_data": json.dumps(scan_data, ensure_ascii=False, indent=2)}).to_messages()
+    prompt_value = await prompt.ainvoke({"scan_data": json.dumps(scan_data, ensure_ascii=False, indent=2)})
+    messages = prompt_value.to_messages()
 
     click.secho("🤖 Generating interrogation questions...", fg="yellow")
     try:
@@ -77,7 +78,7 @@ async def generate_roast(scan_data: dict, llm):
         
         tags = ["A", "B", "C"]
         for tag, option in zip(tags, q_item.options):
-            click.secho(f"   [{tag}] {option}", fg="bright_cyan")
+            click.secho(f"{option}", fg="bright_cyan")
         click.echo()
 
         while True:
@@ -108,7 +109,7 @@ async def generate_roast(scan_data: dict, llm):
 
     try:
         final_roast_obj: FinalRoast = await structured_llm_roast.ainvoke(final_messages)
-        click.secho(final_roast_obj.roast, fg="bright_red")
+        click.secho(final_roast_obj.roast, fg="bright_cyan")
 
     except Exception as e:
         click.secho(f"\n❌ Error generating final structured roast: {e}", fg="red")

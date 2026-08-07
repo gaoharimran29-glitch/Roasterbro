@@ -20,6 +20,8 @@ def file_metrics(files: list , has_test: bool , directories: list) -> dict[str ,
     files_gt_1000_loc = []
     for file , loc in file_lines.items():
         if loc == 0:
+            if "__init__.py" in file:
+                continue
             empty_files.append(file)
         elif loc >= 500 and loc<1000:
             files_gt_500loc.append(file)
