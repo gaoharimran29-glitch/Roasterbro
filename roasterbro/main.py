@@ -245,10 +245,10 @@ def models():
     default="llama3.2:3b",
     help="Specify the LLM model to use (e.g., llama3.2:3b)."
 )
-def roast(path, llm):
+def roast(path, llm, provider):
     """Roast the repo"""
     cwd = scan_and_validate(path, "filemetrics")
-    llm_instance = get_llm(llm)
+    llm_instance = get_llm(provider, llm)
     result = full_scan_for_roast(cwd)
     asyncio.run(generate_roast(result, llm=llm_instance))
 

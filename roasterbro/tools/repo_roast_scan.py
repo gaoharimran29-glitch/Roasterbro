@@ -68,7 +68,7 @@ async def generate_roast(scan_data: dict, llm):
         structured_response: RagebaitResponse = await structured_llm_questions.ainvoke(messages)
     except Exception as e:
         click.secho(f"\n❌ Validation Error: Local model failed to match JSON schema. {e}", fg="red", bold=True)
-        raise click.Abort()
+        raise click.exceptions.Exit(1)
 
     interrogation_history = []
 
@@ -113,7 +113,7 @@ async def generate_roast(scan_data: dict, llm):
 
     except Exception as e:
         click.secho(f"\n❌ Error generating final structured roast: {e}", fg="red")
-        raise click.Abort()
+        raise click.exceptions.Exit(1)
 
     click.echo()
     click.secho("─" * 70, fg="red")
