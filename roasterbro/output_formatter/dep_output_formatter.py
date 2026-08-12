@@ -1,6 +1,7 @@
 import click
 
-def print_dep_output(dep: dict):
+def print_dep_output(dep: dict) -> None:
+    """Prints a colourful, structured summary of the deps using click."""
     click.secho("\n📦 Dependencies", fg="magenta", bold=True, underline=True)
     
     if not dep:

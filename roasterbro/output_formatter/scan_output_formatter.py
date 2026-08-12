@@ -1,6 +1,7 @@
 import click
 
-def print_scan_output(scanning_result: dict):
+def print_scan_output(scanning_result: dict) -> None:
+    """Prints a colourful, structured summary of the scan command using click."""
     click.secho(f"📄 Files Found: ", fg="cyan", nl=False)
     click.secho(f"{len(scanning_result.get("files", 0))}", fg="yellow", bold=True)
     click.secho(f"📁 Directories Found: ", fg="cyan", nl=False)

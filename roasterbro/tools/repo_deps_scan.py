@@ -1,4 +1,6 @@
 import re
+from typing import Any
+
 from roasterbro.utils.constants import DEPENDENCY_MAP, FRAMEWORK_SIGNATURES
 
 pattern = r'(==|>=|<=|~=|!=|@)'
@@ -18,7 +20,10 @@ def clean_name(dependencies: list) -> list:
 
     return cleaned_dep
 
-def dependencies_analyzer(files: list) -> dict:
+def dependencies_analyzer(files: list) -> dict[str, Any]:
+    """Analyze the dependencies and find relevant ecosystem, 
+    package_manager, dependencies, framework, lockfile etc. 
+    """
     dependency_files = DEPENDENCY_MAP.keys()
     dep = {}
     

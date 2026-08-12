@@ -4,7 +4,7 @@ import ollama
 
 load_dotenv()
 
-def find_models():
+def find_models() -> dict[str, dict]:
     """To list the local models and cloud providers api key"""
     response = ollama.list()
     ollama_models = {}

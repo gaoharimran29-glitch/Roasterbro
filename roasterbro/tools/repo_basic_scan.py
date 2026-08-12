@@ -2,6 +2,8 @@ import os
 import re
 import click
 from datetime import datetime
+from typing import Any
+
 from roasterbro.utils.constants import EXCLUDED_FILES, SUSPICIOUS_PATTERNS
 
 def check_important_files(files: list[str]) -> dict[str, bool]:
@@ -67,7 +69,7 @@ def check_suspicious_file(files: list) -> list:
 
     return suspicious_files
 
-def repo_scan_findings(cwd) -> dict:
+def repo_scan_findings(cwd) -> dict[str, Any]:
     """Analyze the repo and return root repo path , files path and directories the repo"""
 
     click.secho("")

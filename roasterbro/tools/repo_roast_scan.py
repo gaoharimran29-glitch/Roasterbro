@@ -1,8 +1,9 @@
 import json
 import click
 from git import Head
-from langchain_core.prompts import ChatPromptTemplate
+from typing import Any
 
+from langchain_core.prompts import ChatPromptTemplate
 from roasterbro.tools.repo_basic_scan import repo_scan_findings
 from roasterbro.tools.repo_deps_scan import dependencies_analyzer
 from roasterbro.tools.repo_file_scan import file_metrics
@@ -16,7 +17,13 @@ from roasterbro.prompts.questions_generate_prompt import QUESTION_SYSTEM_PROMPT,
 from roasterbro.models.roast_output_model import RagebaitResponse, FinalRoast, RepoFacts
 from langsmith import traceable
 
-def make_json_safe(obj):
+def make_json_safe(obj: Any) -> Any:
+    """Recursively convert an object into a JSON-safe representation.
+
+    Dictionaries, lists, tuples, and sets are traversed recursively.
+    Tuples and sets are converted to lists, and ``Head`` objects are
+    converted to strings. Other values are returned unchanged.
+    """
     if isinstance(obj, dict):
         return {k: make_json_safe(v) for k, v in obj.items()}
     elif isinstance(obj, (set, tuple)):
@@ -29,8 +36,8 @@ def make_json_safe(obj):
         return obj
 
 
-def full_scan_for_roast(cwd):
-
+def full_scan_for_roast(cwd) -> dict[str, dict]:
+    """Full scanning of repo combining all outputs to generate the roast"""
     scanning_result = repo_scan_findings(cwd)
 
     files = scanning_result.get("files", [])
@@ -58,7 +65,8 @@ def full_scan_for_roast(cwd):
 
 
 @traceable(name="Roasterbro")
-async def generate_roast(scan_data: dict, llm):
+async def generate_roast(scan_data: dict, llm) -> None:
+    """Invoke the LLM, Prints a colourful, structured summary of the roast command using click."""
     scan_data = make_json_safe(scan_data)
 
     structured_llm_facts = llm.with_structured_output(RepoFacts)

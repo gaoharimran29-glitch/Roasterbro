@@ -1,6 +1,7 @@
 import click
 
-def print_filestats_output(stats: dict):
+def print_filestats_output(stats: dict) -> None:
+    """Prints a colourful, structured summary of the filestats command using click."""
     click.secho("\n 📊 Code Statistics", fg="magenta", bold=True, underline=True)
     
     click.secho(f"  Total LOC          : ", fg="cyan", nl=False)

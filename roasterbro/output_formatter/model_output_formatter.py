@@ -1,6 +1,7 @@
 import click
 
-def print_model_output(data: dict):
+def print_model_output(data: dict) -> None:
+    """Prints a colourful, structured summary of the model command using click."""
     ollama_models = data.get("ollama_models", {})
     cloud_providers = data.get("cloud_providers", {})
 

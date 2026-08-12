@@ -1,6 +1,7 @@
 import os
 import click
 from dotenv import load_dotenv
+from typing import NoReturn
 from pydantic import ValidationError
 
 from langchain_ollama import ChatOllama
@@ -9,7 +10,6 @@ from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_mistralai import ChatMistralAI
 from langchain_anthropic import ChatAnthropic
-
 from langchain_core.language_models.chat_models import BaseChatModel
 
 load_dotenv()
@@ -24,7 +24,7 @@ PROVIDER_MAP = {
 }
 
 
-def _fail(message: str):
+def _fail(message: str) -> NoReturn:
     """Print a formatted error and exit once, cleanly."""
     click.secho(f"✖ {message}", fg="red", bold=True)
     click.secho("Run `roasterbro models` to check the configured api key and local LLM", fg="yellow")

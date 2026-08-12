@@ -1,6 +1,7 @@
 import click
 
-def print_lang_output(languages: dict):
+def print_lang_output(languages: dict) -> None:
+    """Prints a colourful, structured summary of the langs command using click."""
     click.secho("💻 Languages Detected", fg="magenta", bold=True, underline=True)
     
     if not languages:

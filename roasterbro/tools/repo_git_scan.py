@@ -1,7 +1,8 @@
-from datetime import datetime
 import git
+from typing import Any
+from datetime import datetime
 
-def analyze_git_repository(path: str) -> dict:
+def analyze_git_repository(path: str) -> dict[str, Any]:
     """Analyze hidden git file and return git related metadata"""
     try:
         git_repo = git.Repo(path, search_parent_directories=True)
@@ -37,6 +38,7 @@ def analyze_git_repository(path: str) -> dict:
             "Git Repository": False,
             "Error": "No git file detected"
         }
+    
     except git.exc.NoSuchPathError:
         return {
             "Git Repository": False,

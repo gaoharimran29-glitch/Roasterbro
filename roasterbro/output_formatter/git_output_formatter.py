@@ -1,6 +1,7 @@
 import click
 
-def print_git_output(git_info: dict):
+def print_git_output(git_info: dict) -> None:
+    """Prints a colourful, structured summary of the gitanalyze command using click."""
     click.secho("")
     if not git_info.get("Git Repository"):
         click.secho(f"✖ Not a git repository", fg="red", bold=True)
