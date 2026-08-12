@@ -1,0 +1,20 @@
+# CLI framework and packaging
+setuptools==83.0.0
+click==8.4.2
+
+# Python utilities and configuration
+pydantic==2.13.4
+python-dotenv==1.2.1
+
+# Project utilities
+ollama==0.6.2
+gitdb==4.0.12
+
+# LangChain integrations
+langchain-ollama==1.1.0
+langchain-core==1.5.2
+langchain-openai==1.4.1
+langchain-groq==1.1.3
+langchain-google-genai==4.3.2
+langchain-mistralai==1.1.6
+langchain-anthropic==1.5.4
