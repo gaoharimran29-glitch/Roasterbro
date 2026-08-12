@@ -1,8 +1,9 @@
 import os
 import re
 import click
-from datetime import datetime
 from typing import Any
+from datetime import datetime
+from pathlib import Path
 
 from roasterbro.utils.constants import EXCLUDED_FILES, SUSPICIOUS_PATTERNS
 

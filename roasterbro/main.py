@@ -52,12 +52,15 @@ class AliasedGroup(click.Group):
         "-r": "roast"
     }
 
+
     def get_command(self, ctx, cmd_name):
         actual_name = self.aliases.get(cmd_name, cmd_name)
         return click.Group.get_command(self, ctx, actual_name)
 
+
     def list_commands(self, ctx):
         return click.Group.list_commands(self, ctx)
+
 
     def format_commands(self, ctx, formatter):
         rows = []
@@ -82,10 +85,11 @@ class AliasedGroup(click.Group):
             with formatter.section("Commands"):
                 formatter.write_dl(rows)
 
+
 @click.group(context_settings={"help_option_names": ["-h", "--help"], "ignore_unknown_options":True}, invoke_without_command=True, cls=AliasedGroup)
 @click.version_option("0.1.0", "-v", "--version", prog_name="Roasterbro", message="%(prog)s %(version)s")
 @click.pass_context
-def main(ctx):
+def main(ctx) -> None:
     """RoasterBro - A CLI to roast and scan your codebase."""
     if ctx.invoked_subcommand is None:
         click.secho(BANNER, fg="green", bold=True)
@@ -101,7 +105,7 @@ def main(ctx):
 
 @main.command()
 @click.argument("path", required=False, default=None)
-def scan(path):
+def scan(path: str | None) -> None:
     """Return basic info about the repo"""
     cwd = scan_and_validate(path, "scan")
     scanning_result = repo_scan_findings(cwd)
@@ -111,7 +115,7 @@ def scan(path):
 
 @main.command()
 @click.argument("path", required=False, default=None)
-def gitanalyze(path):
+def gitanalyze(path: str | None) -> None:
     """Return git info about the repo"""
     cwd = scan_and_validate(path, "gitanalyze")
     git_info = analyze_git_repository(cwd)
@@ -121,9 +125,9 @@ def gitanalyze(path):
 
 @main.command()
 @click.argument("path", required=False, default=None)
-def langs(path):
+def langs(path: str | None) -> None:
     """Return all the languages used in the repo"""
-    cwd = scan_and_validate(path, "lang")
+    cwd = scan_and_validate(path, "langs")
     scanning_result = repo_scan_findings(cwd)
     files = scanning_result.get("files", [])
     languages = languages_present(files=files)
@@ -133,7 +137,7 @@ def langs(path):
 
 @main.command()
 @click.argument("path", required=False, default=None)
-def deps(path):
+def deps(path: str | None) -> None:
     """Return all the dependencies used in the repo"""
     cwd = scan_and_validate(path, "deps")
     scanning_result = repo_scan_findings(cwd)
@@ -145,9 +149,9 @@ def deps(path):
 
 @main.command()
 @click.argument("path", required=False, default=None)
-def filestats(path):
+def filestats(path: str | None) -> None:
     """Return stats related to files in the repo"""
-    cwd = scan_and_validate(path, "filemetrics")
+    cwd = scan_and_validate(path, "filestats")
     scanning_result = repo_scan_findings(cwd)
     files = scanning_result.get("files", [])
     directories = scanning_result.get("directories" , [])
@@ -159,7 +163,7 @@ def filestats(path):
 
 @main.command()
 @click.argument("path", required=False, default=None)
-def whitespace(path):
+def whitespace(path: str | None) -> None:
     """Return filename, filenumber if contains a trailing whitespace"""
     cwd = scan_and_validate(path, "whitespace")
     scanning_result = repo_scan_findings(cwd)
@@ -177,9 +181,9 @@ def whitespace(path):
     default=None,
     help="To save the output in the json file"
 )
-def fullscan(path, json_path):
+def fullscan(path: str | None, json_path: str | None) -> None:
     """Return combined full scan result"""
-    cwd = scan_and_validate(path, "filemetrics")
+    cwd = scan_and_validate(path, "fullscan")
     scanning_result = repo_scan_findings(cwd)
     print_scan_output(scanning_result)
 
@@ -224,7 +228,7 @@ def fullscan(path, json_path):
 
 
 @main.command()
-def models():
+def models() -> None:
     """To detect the local repo and cloud provider api keys"""
     result = find_models()
     print_model_output(result)
@@ -245,9 +249,9 @@ def models():
     default="gemini-2.5-flash-lite",
     help="Specify the LLM model to use (e.g., gemini-2.5-flash-lite)."
 )
-def roast(path, llm, provider):
+def roast(path: str | None, llm: str, provider: str) -> None:
     """Roast the repo"""
-    cwd = scan_and_validate(path, "filemetrics")
+    cwd = scan_and_validate(path, "roast")
     llm_instance = get_llm(provider, llm)
     result = full_scan_for_roast(cwd)
     asyncio.run(generate_roast(result, llm=llm_instance))

@@ -5,7 +5,8 @@ from pathlib import Path
 from typing import Dict, Any, List
 import click
 
-def scan_and_validate(path, function_name: str):
+
+def scan_and_validate(path: str | None, function_name: str) -> Path:
     if path is None:
         click.secho("Nothing specified, nothing added.", fg="red", bold=True)
         click.secho(f"hint: Maybe you wanted to say 'roasterbro {function_name} .'?", fg="yellow")
@@ -15,13 +16,14 @@ def scan_and_validate(path, function_name: str):
     
     if not cwd.exists():
         click.secho(f"✖ Error: Path doesn't exists -> {cwd}", fg="red", bold=True)
+        raise click.exceptions.Exit(1)
     
-    elif not cwd.is_dir():
+    if not cwd.is_dir():
         click.secho(f"✖ Error: It is not a directory -> {cwd}", fg="red", bold=True)
         raise click.exceptions.Exit(1)
     
-    else:
-        return cwd
+    return cwd
+
 
 def parse_requirements(file_path: Path) -> Dict[str , Any]:
     """Parse the requirements.txt file, then extract and return dependencies from it."""
@@ -49,6 +51,7 @@ def parse_requirements(file_path: Path) -> Dict[str , Any]:
             "dependency_count": len(dependencies),
             "dependencies": dependencies
         }
+
 
 def parse_node(file_path: Path) -> Dict[str , Any]:
     """Parse the package.json file, then extract and return dependencies from it."""
@@ -80,6 +83,7 @@ def parse_node(file_path: Path) -> Dict[str , Any]:
             "dependency_count": len(dependencies),
             "dependencies": dependencies
         }
+
 
 def parse_pyproject(file_path: Path) -> Dict[str , Any]:
     """Parse the pyproject.toml file, then extract and return dependencies from it."""
@@ -117,12 +121,9 @@ def parse_pyproject(file_path: Path) -> Dict[str , Any]:
     elif "tool" in content and "poetry" in content["tool"]:
         poetry_data = content["tool"]["poetry"]
 
-        # 1. Poetry Production Dependencies
         prod_dict = poetry_data.get("dependencies", {})
-        # Note: 'python' is often in this dict; you may want to filter it out
         raw_deps = [pkg for pkg in prod_dict.keys() if pkg != "python"]
 
-        # 2. Poetry Dev Dependencies (Checks modern group syntax first, then legacy)
         dev_dict = (poetry_data.get("group", {}).get("dev", {}).get("dependencies", {}))
         if not dev_dict:
             dev_dict = poetry_data.get("dev-dependencies", {})
@@ -176,6 +177,7 @@ def parse_cargo(file_path: Path) -> Dict[str , Any]:
             "dependency_count": len(dependencies),
             "dependencies": dependencies
         }
+
 
 def parse_gomod(file_path: Path, include_indirect: bool = False) -> Dict[str, Any]:
     """
