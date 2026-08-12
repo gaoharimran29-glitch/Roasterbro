@@ -1,5 +1,7 @@
 import os
+
 from roasterbro.utils.constants import EXTENSION_LANGUAGE_MAP
+
 
 def languages_present(files: list) -> dict[str, int]:
     """Return all unique languages used in the directory."""

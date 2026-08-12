@@ -7,6 +7,7 @@ from pathlib import Path
 
 from roasterbro.utils.constants import EXCLUDED_FILES, SUSPICIOUS_PATTERNS
 
+
 def check_important_files(files: list[str]) -> dict[str, bool]:
     """Check whether basic important files and directories are present in the repo."""
     
@@ -60,6 +61,7 @@ def check_important_files(files: list[str]) -> dict[str, bool]:
 
     return results
 
+
 def check_suspicious_file(files: list) -> list:
     """Check for the suspicious files (e.g. .env ) in the repo"""
     suspicious_files = []
@@ -70,7 +72,8 @@ def check_suspicious_file(files: list) -> list:
 
     return suspicious_files
 
-def repo_scan_findings(cwd) -> dict[str, Any]:
+
+def repo_scan_findings(cwd: Path) -> dict[str, Any]:
     """Analyze the repo and return root repo path , files path and directories the repo"""
 
     click.secho("")

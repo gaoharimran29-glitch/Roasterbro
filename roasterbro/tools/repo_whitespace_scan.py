@@ -1,3 +1,4 @@
+
 def whitespace_scan(files: list) -> dict[str, list[int]]:
     """Check whitespaces in all files and return filenames along with 
     line_numbers containing trailing whitespaces 

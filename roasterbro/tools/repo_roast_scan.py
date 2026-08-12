@@ -2,8 +2,11 @@ import json
 import click
 from git import Head
 from typing import Any
+from pathlib import Path
 
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.language_models.chat_models import BaseChatModel
+
 from roasterbro.tools.repo_basic_scan import repo_scan_findings
 from roasterbro.tools.repo_deps_scan import dependencies_analyzer
 from roasterbro.tools.repo_file_scan import file_metrics
@@ -16,6 +19,7 @@ from roasterbro.prompts.questions_generate_prompt import QUESTION_SYSTEM_PROMPT,
 
 from roasterbro.models.roast_output_model import RagebaitResponse, FinalRoast, RepoFacts
 from langsmith import traceable
+
 
 def make_json_safe(obj: Any) -> Any:
     """Recursively convert an object into a JSON-safe representation.
@@ -36,7 +40,7 @@ def make_json_safe(obj: Any) -> Any:
         return obj
 
 
-def full_scan_for_roast(cwd) -> dict[str, dict]:
+def full_scan_for_roast(cwd: Path) -> dict[str, dict]:
     """Full scanning of repo combining all outputs to generate the roast"""
     scanning_result = repo_scan_findings(cwd)
 
@@ -65,7 +69,7 @@ def full_scan_for_roast(cwd) -> dict[str, dict]:
 
 
 @traceable(name="Roasterbro")
-async def generate_roast(scan_data: dict, llm) -> None:
+async def generate_roast(scan_data: dict, llm: BaseChatModel) -> None:
     """Invoke the LLM, Prints a colourful, structured summary of the roast command using click."""
     scan_data = make_json_safe(scan_data)
 

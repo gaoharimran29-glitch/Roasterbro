@@ -2,6 +2,7 @@ import git
 from typing import Any
 from datetime import datetime
 
+
 def analyze_git_repository(path: str) -> dict[str, Any]:
     """Analyze hidden git file and return git related metadata"""
     try:

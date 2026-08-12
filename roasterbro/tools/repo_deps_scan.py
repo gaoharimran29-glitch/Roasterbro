@@ -5,6 +5,7 @@ from roasterbro.utils.constants import DEPENDENCY_MAP, FRAMEWORK_SIGNATURES
 
 pattern = r'(==|>=|<=|~=|!=|@)'
 
+
 def clean_name(dependencies: list) -> list:
     """Clean dependencies name For eg: "curl-cffi>=0.15.0" as a curl-cffi"""
 
@@ -19,6 +20,7 @@ def clean_name(dependencies: list) -> list:
             cleaned_dep.append(clean)
 
     return cleaned_dep
+
 
 def dependencies_analyzer(files: list) -> dict[str, Any]:
     """Analyze the dependencies and find relevant ecosystem, 

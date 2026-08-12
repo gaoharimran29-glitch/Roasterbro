@@ -1,5 +1,6 @@
 import os
 
+
 def file_metrics(files: list , has_test: bool , directories: list) -> dict[str , int]:
     """Analyze the files of the repo and return deep metrics"""
     file_lines = {}
