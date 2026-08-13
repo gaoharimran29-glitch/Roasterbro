@@ -1,12 +1,6 @@
 <div align="center">
 
-<pre style="display:inline-block; text-align:left; margin:0 auto;">
- ____                 _            ____            
-|  _ \ ___   __ _ ___| |_ ___ _ __| __ ) _ __ ___   
-| |_) / _ \ / _` / __| __/ _ \ '__|  _ \| '__/ _ \  
-|  _ < (_) | (_| \__ \ ||  __/ |  | |_) | | | (_) | 
-|_| \_\___/ \__,_|___/\__\___|_|  |____/|_|  \___/  
-</pre>
+<img src="assets/roasterbro-logo.svg" alt="RoasterBro logo" width="480">
  
 
 ### A CLI that scans your codebase — and then roasts it. 🔥
