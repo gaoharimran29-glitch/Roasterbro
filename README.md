@@ -1,12 +1,13 @@
 <div align="center">
 
-```
+<pre style="display:inline-block; text-align:left; margin:0 auto;">
  ____                 _            ____            
 |  _ \ ___   __ _ ___| |_ ___ _ __| __ ) _ __ ___   
 | |_) / _ \ / _` / __| __/ _ \ '__|  _ \| '__/ _ \  
 |  _ < (_) | (_| \__ \ ||  __/ |  | |_) | | | (_) | 
 |_| \_\___/ \__,_|___/\__\___|_|  |____/|_|  \___/  
-```
+</pre>
+ 
 
 ### A CLI that scans your codebase — and then roasts it. 🔥
 
@@ -18,6 +19,31 @@
 [![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)](#)
 
 </div>
+
+---
+
+## 📚 Table of Contents
+ 
+- [Overview](#-overview)
+- [Features](#-features)
+- [Installation](#️-installation)
+- [Usage](#-usage)
+- [Commands](#-commands)
+- [Command Details](#-command-details)
+  - [scan](#scan--basic-repo-info)
+  - [gitanalyze](#gitanalyze--git-insights)
+  - [langs](#langs--language-breakdown)
+  - [deps](#deps--dependency-analysis)
+  - [filestats](#filestats--file-statistics)
+  - [whitespace](#whitespace--whitespace-scanner)
+  - [fullscan](#fullscan--everything-at-once)
+  - [models](#models--detect-available-llms)
+  - [roast](#roast--roast-your-repo-)
+- [Examples](#-examples)
+- [Project Structure](#️-project-structure)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Author](#-author)
 
 ---
 
@@ -279,7 +305,8 @@ This project is licensed under the **MIT License**.
 ## 👤 Author
 
 **Gaohar Imran**
-Project repository: [github.com/gaoharimran29-glitch/Roasterbro](https://github.com/gaoharimran29-glitch/Roasterbro)
+- Github: [@gaoharimran29-glitch](https://github.com/gaoharimran29-glitch)
+- LinkedIn: [Gaohar Imran](https://www.linkedin.com/in/gaohar-imran-5a4063379/)
 
 ---
 
