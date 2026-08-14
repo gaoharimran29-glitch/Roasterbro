@@ -3,7 +3,7 @@
 <img src="assets/roasterbro-logo.svg" alt="RoasterBro logo" width="480">
  
 
-### A CLI that scans your codebase — and then roasts it. 🔥
+### A CLI that scans your codebase, interrogates you and then roasts it.
 
 **Version 0.1.0** · Made by [Gaohar Imran](https://github.com/gaoharimran29-glitch)
 
@@ -51,16 +51,20 @@ Think of it as part static-analysis tool, part linter, part stand-up comedian.
 
 ## ✨ Features
 
-- 🔍 **Repo Scan** — Quick overview of your project structure
-- 🌐 **Language Detection** — See every language used across your codebase
-- 📦 **Dependency Analysis** — Surface the dependencies your project relies on
-- 📊 **File Statistics** — Metrics on files, directories, and test coverage presence
-- 🌱 **Git Analysis** — Insights pulled straight from your repository's git history
-- 🧹 **Whitespace Scanner** — Hunt down trailing whitespace, file by file, line by line
-- 🧠 **Model Discovery** — Detect available local and cloud LLM provider API keys
-- 🗂️ **Full Scan** — Run everything at once, with optional JSON export
-- 🔥 **AI Roast** — Feed your repo's findings to an LLM and get roasted, powered by your choice of provider and model
-- ⚡ **Short Aliases** — Every command has a fast, memorable shortcut
+* 🔍 **Repo Scan** — Quick overview of your project structure and project maturity signals
+* 🌐 **Language Detection** — See every language used across your codebase
+* 📦 **Dependency Analysis** — Analyze dependencies, package managers, frameworks, and ecosystems
+* 📊 **File Statistics** — Inspect LOC, file sizes, largest files, empty files, and test files
+* 🌱 **Git Analysis** — Insights pulled straight from your repository's Git history
+* 🧹 **Whitespace Scanner** — Hunt down trailing whitespace, file by file, line by line
+* 🏗️ **Project Maturity Analysis** — Detect testing, CI/CD, documentation, security, contribution, and other repository signals
+* 🔐 **Suspicious File Detection** — Identify files that may require additional attention
+* 🧠 **Model Discovery** — Detect available local LLM setups and configured cloud providers
+* 🤖 **Multi-Provider LLM Support** — Use local models through Ollama or supported online LLM providers
+* 🗂️ **Full Scan** — Run repository analysis together, with optional JSON export
+* 🔥 **AI Interrogation & Roast** — Answer 3 repository-based ragebait questions before receiving a personalized final roast
+* 🎯 **Evidence-Based Roasting** — Generate jokes and questions from actual repository signals instead of predefined jokes
+* ⚡ **Short Aliases** — Every command has a fast, memorable shortcut
 
 ---
 
@@ -124,8 +128,8 @@ roasterbro -v
 | `filestats` | `-fs` | Return stats related to files in the repo |
 | `whitespace` | `-w` | Return filename and line number for trailing whitespace |
 | `fullscan` | `-f` | Run a combined full scan (with optional JSON export) |
-| `models` | `-m` | Detect local repo and cloud provider API keys |
-| `roast` | `-r` | Roast the repo using an LLM |
+| `models` | `-m` | Detect local LLM models and cloud LLM provider API keys |
+| `roast` | `-r` | Interrogate the developer with 3 repository-based ragebait questions and generate a final AI roast |
 
 Every command (except `models`) accepts an optional `PATH` argument pointing to the repository you want to analyze. If omitted, it defaults to the current directory.
 
@@ -204,6 +208,48 @@ Runs a full scan and hands the results to an LLM, which then proceeds to roast y
 |---|---|---|
 | `--provider` | `google` | LLM provider company (e.g. `google`) |
 | `--llm` | `gemini-2.5-flash-lite` | Specific LLM model to use |
+
+---
+
+## 🤖 LLM Support
+
+RoasterBro's AI features are designed to work with different LLM providers.
+
+### Local Models with Ollama
+
+RoasterBro supports locally running models through Ollama.
+
+Example:
+
+```bash
+roasterbro roast . --provider ollama --llm llama3.2:3b
+```
+
+You can use any model available through your Ollama installation.
+The model does not need to be hardcoded into RoasterBro.
+
+### Online Models
+
+RoasterBro can also use configured online LLM providers.
+
+Example:
+
+```bash
+roasterbro roast . --provider google --llm gemini-2.5-flash-lite
+```
+
+Provider API keys should be configured through environment variables.
+
+Check Available Models
+```bash
+roasterbro models
+
+or:
+
+roasterbro -m
+```
+
+This command helps identify available local LLM configurations and configured online providers.
 
 ---
 

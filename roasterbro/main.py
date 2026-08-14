@@ -32,8 +32,8 @@ BANNER = r"""
 │                     | | \ \ (_) | (_| \__ \ ||  __/ |  | |_) | | | (_) |                               │
 │                     |_|  \_\___/ \__,_|___/\__\___|_|  |_.__/|_|  \___/                                │
 │                                                                                                        │
-│                        A CLI to roast and scan your codebase - 0.1.0                                   │
-│                                  Made by - Gaohar Imran                                                │
+│           A CLI that scans your codebase, interrogates you and then roasts it. - 0.1.0                 │
+│                                   Made by - Gaohar Imran                                                │
 │                                                                                                        │
 ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 """
@@ -164,7 +164,7 @@ def filestats(path: str | None) -> None:
 @main.command()
 @click.argument("path", required=False, default=None)
 def whitespace(path: str | None) -> None:
-    """Return filename, filenumber if contains a trailing whitespace"""
+    """Return filename and line number for trailing whitespace"""
     cwd = scan_and_validate(path, "whitespace")
     scanning_result = repo_scan_findings(cwd)
     files = scanning_result.get("files", [])
@@ -182,7 +182,7 @@ def whitespace(path: str | None) -> None:
     help="To save the output in the json file"
 )
 def fullscan(path: str | None, json_path: str | None) -> None:
-    """Return combined full scan result"""
+    """Run a combined full scan (with optional JSON export"""
     cwd = scan_and_validate(path, "fullscan")
     scanning_result = repo_scan_findings(cwd)
     print_scan_output(scanning_result)
@@ -229,7 +229,7 @@ def fullscan(path: str | None, json_path: str | None) -> None:
 
 @main.command()
 def models() -> None:
-    """To detect the local repo and cloud provider api keys"""
+    """Detect local LLM models and cloud LLM provider API keys"""
     result = find_models()
     print_model_output(result)
     click.secho(" ✨ Done!\n", fg="green", bold=True)
@@ -250,7 +250,7 @@ def models() -> None:
     help="Specify the LLM model to use (e.g., gemini-2.5-flash-lite)."
 )
 def roast(path: str | None, llm: str, provider: str) -> None:
-    """Roast the repo"""
+    """Interrogate the developer with 3 repository-based ragebait questions and generate a final AI roast"""
     cwd = scan_and_validate(path, "roast")
     llm_instance = get_llm(provider, llm)
     result = full_scan_for_roast(cwd)
