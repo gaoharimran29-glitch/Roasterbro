@@ -4,21 +4,18 @@ from pathlib import Path
 
 from roasterbro.utils.constants import DEPENDENCY_MAP, FRAMEWORK_SIGNATURES
 
-pattern = r'(==|>=|<=|~=|!=|@)'
+pattern = r"(==|>=|<=|~=|!=)"
 
 
 def clean_name(dependencies: list) -> list:
-    """Clean dependencies name For eg: "curl-cffi>=0.15.0" as a curl-cffi"""
+    """Clean dependency names while preserving npm scoped packages."""
 
     cleaned_dep = []
+
     for dep in dependencies:
-        if dep.startswith("@"):
-            clean = dep.replace("@" , "" , 1)
-            cleaned_dep.append(clean)
-        else:
-            parts = re.split(pattern, dep)[0]
-            clean = parts.replace("_" , "-").strip().lower()
-            cleaned_dep.append(clean)
+        clean = re.split(pattern, dep, maxsplit=1)[0]
+        clean = clean.replace("_", "-").strip().lower()
+        cleaned_dep.append(clean)
 
     return cleaned_dep
 
