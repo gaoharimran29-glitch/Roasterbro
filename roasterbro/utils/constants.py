@@ -4,12 +4,30 @@ from roasterbro.utils.helpers import (parse_node,
     parse_cargo, 
     parse_gomod)
 
-EXCLUDED_FILES = [".git", ".svn", ".hg", "venv", ".venv", "node_modules", 
-"site-packages", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache",
-"build", "dist", "roasterbro.egg-info", ".eggs", ".idea", ".vscode", "htmlcov", ".coverage", 
-"_build" , ".pyc", ".pyo", ".pyd", ".so", ".dll", ".exe", ".bin", ".zip", ".tar", ".gz", ".7z", 
-".rar", ".db", ".sqlite", ".sqlite3", ".log", ".png", ".jpg", ".jpeg", ".gif", ".ico", ".svg", 
-".webp", ".mp3", ".mp4", ".wav", ".avi", ".ttf", ".woff", ".woff2", ".pdf", ".docx", ".xlsx"]
+EXCLUDED_DIRS = [
+    ".git",
+    ".venv",
+    "venv",
+    "env",
+    "__pycache__",
+    "node_modules",
+    "dist",
+    "build",
+    ".idea",
+    ".vscode",
+]
+
+EXCLUDED_EXTENSIONS = [
+    ".pyc",
+    ".pyo",
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".db",
+    ".pdf",
+    ".zip",
+]
 
 SUSPICIOUS_PATTERNS = [".env", ".env.local", ".env.production", ".env.dev", ".env.backup",
 "id_rsa", "id_dsa", "private.pem", "private.key", "credentials.json", "service-account.json"]

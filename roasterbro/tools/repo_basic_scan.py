@@ -5,7 +5,7 @@ from typing import Any
 from datetime import datetime
 from pathlib import Path
 
-from roasterbro.utils.constants import EXCLUDED_FILES, SUSPICIOUS_PATTERNS
+from roasterbro.utils.constants import EXCLUDED_DIRS, SUSPICIOUS_PATTERNS, EXCLUDED_EXTENSIONS
 
 
 def check_important_files(files: list[str]) -> dict[str, bool]:
@@ -94,12 +94,17 @@ def repo_scan_findings(cwd: Path) -> dict[str, Any]:
     files = []
     directories = []
     for item in cwd.rglob("*"):
-        if any(part in item.parts for part in EXCLUDED_FILES):
+        if any(part in EXCLUDED_DIRS for part in item.parts):
             continue
-        elif item.is_dir():
+
+        if item.is_dir():
             directories.append(str(item.relative_to(cwd)))
-        else:
-            files.append(str(item.relative_to(cwd)))
+            continue
+
+        if item.suffix.lower() in EXCLUDED_EXTENSIONS:
+            continue
+
+        files.append(str(item.relative_to(cwd)))
 
     test_keywords = {"test", "tests", "__tests__", "spec", "specs"}
 
