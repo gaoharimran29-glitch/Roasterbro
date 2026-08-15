@@ -1,5 +1,6 @@
 import re
 from typing import Any
+from pathlib import Path
 
 from roasterbro.utils.constants import DEPENDENCY_MAP, FRAMEWORK_SIGNATURES
 
@@ -30,18 +31,24 @@ def dependencies_analyzer(files: list) -> dict[str, Any]:
     dep = {}
     
     for dep_file in dependency_files:
-        actual_file_path = next((f for f in files if dep_file in f), None)
-        if actual_file_path: 
-            config = DEPENDENCY_MAP[dep_file] 
+        matching_files = [
+            f for f in files
+            if Path(f).name == dep_file
+        ]
+
+        for actual_file_path in matching_files:
+            config = DEPENDENCY_MAP[dep_file]
+
             ecosystem = config.get("ecosystem")
-            lockfile_override = config.get("lockfile_override")
+            lockfile_override = config.get("lockfile_override", {})
             parser = config.get("handler")
             default_pm = config.get("default_pm")
+
             pm = []
-            if lockfile_override.keys():
-                for lockfile in lockfile_override.keys():
-                    if any(lockfile in f for f in files):
-                        pm.append(lockfile_override.get(lockfile))
+
+            for lockfile, package_manager in lockfile_override.items():
+                if any(Path(f).name == lockfile for f in files):
+                    pm.append(package_manager)
 
             if not pm:
                 pm = default_pm
