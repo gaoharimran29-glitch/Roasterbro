@@ -1,3 +1,4 @@
+import os
 import json
 import tomllib
 import re
@@ -21,7 +22,8 @@ def scan_and_validate(path: str | None, function_name: str) -> Path:
     if not cwd.is_dir():
         click.secho(f"✖ Error: It is not a directory -> {cwd}", fg="red", bold=True)
         raise click.exceptions.Exit(1)
-    
+
+    os.chdir(cwd)
     return cwd
 
 
