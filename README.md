@@ -91,7 +91,6 @@ Once installed, the `roasterbro` command will be available in your terminal.
 roasterbro [COMMAND] [PATH] [OPTIONS]
 ```
 
-If no `PATH` is provided, RoasterBro defaults to scanning the **current working directory**.
 
 Running `roasterbro` with no arguments displays the banner and a quick pointer to the help menu:
 
@@ -131,7 +130,7 @@ roasterbro -v
 | `models` | `-m` | Detect local LLM models and cloud LLM provider API keys |
 | `roast` | `-r` | Interrogate the developer with 3 repository-based ragebait questions and generate a final AI roast |
 
-Every command (except `models`) accepts an optional `PATH` argument pointing to the repository you want to analyze. If omitted, it defaults to the current directory.
+Every command (except `models`) accepts a required `PATH` argument pointing to the repository you want to analyze.
 
 ---
 
