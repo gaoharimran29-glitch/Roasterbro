@@ -30,7 +30,7 @@ def file_metrics(files: list , has_test: bool , directories: list) -> dict[str ,
     
     total_loc = sum(file_lines.values())
     largest_loc_file = max(file_lines.values())
-    readme_loc = file_lines.get("README.md") or file_lines.get("readme")
+    readme_loc = file_lines.get("README.md")
 
     empty_files = []
     files_gt_500loc = []

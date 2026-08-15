@@ -6,7 +6,7 @@ from datetime import datetime
 def analyze_git_repository(path: str) -> dict[str, Any]:
     """Analyze hidden git file and return git related metadata"""
     try:
-        git_repo = git.Repo(path, search_parent_directories=True)
+        git_repo = git.Repo(path)
         git_file_path = git_repo.git_dir
 
         if git_repo.head.is_valid():

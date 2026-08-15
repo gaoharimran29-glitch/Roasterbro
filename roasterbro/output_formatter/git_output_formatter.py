@@ -9,7 +9,6 @@ def print_git_output(git_info: dict) -> None:
         click.secho(f"{git_info.get('Error', 'Unknown')}", fg="white")
         click.secho("hint: Are you in root of a git repo ?", fg="yellow")
         click.secho("─" * 50, fg="bright_black")
-        click.secho(" ✨ Done!\n", fg="green", bold=True)
         return
 
     click.secho(f"  ✔ Git repository detected", fg="green", bold=True)
