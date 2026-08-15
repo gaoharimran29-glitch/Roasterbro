@@ -52,21 +52,41 @@ def dependencies_analyzer(files: list) -> dict[str, Any]:
 
             framework = []
             framework_categories = []
+            overridden_frameworks = set()
 
             if isinstance(ecosystem, str):
                 ecosystem = [ecosystem.lower()]
+
             if isinstance(ecosystem, list):
                 ecosystem = [x.lower() for x in ecosystem]
 
             for eco in ecosystem:
                 info = FRAMEWORK_SIGNATURES.get(eco, {})
-                for clean_dep in cleaned_dependencies: 
-                    if clean_dep in info:
-                        framework_info = info.get(clean_dep, {})
-                        packages = framework_info.get("packages")
-                        categories = framework_info.get("category")
-                        framework.extend(packages)
-                        framework_categories.append(categories)
+
+                for clean_dep in cleaned_dependencies:
+                    if clean_dep not in info:
+                        continue
+
+                    framework_info = info[clean_dep]
+
+                    category = framework_info.get("category", "")
+                    overrides = framework_info.get("overrides", [])
+
+                    framework.append(clean_dep)
+                    framework_categories.append(category)
+
+                    overridden_frameworks.update(
+                        x.lower() for x in overrides
+                    )
+
+            filtered = [
+                (fw, category)
+                for fw, category in zip(framework, framework_categories)
+                if fw.lower() not in overridden_frameworks
+            ]
+
+            framework = [fw for fw, _ in filtered]
+            framework_categories = [category for _, category in filtered]
 
             dep.update({
                 actual_file_path: {

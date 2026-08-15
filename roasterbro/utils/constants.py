@@ -37,12 +37,12 @@ FRAMEWORK_SIGNATURES = {
         "next": {
             "packages": ["next"],
             "category": "Full-Stack Framework",
-            "overrides": ["React"]  # Next.js overrides React in detection
+            "overrides": ["react"]  # Next.js overrides React in detection
         },
         "nestjs": {
             "packages": ["nestjs/core"],
             "category": "Backend Framework",
-            "overrides": ["Express"]  # NestJS often uses Express under the hood
+            "overrides": ["express"]  # NestJS often uses Express under the hood
         },
         "express": {
             "packages": ["express"],
