@@ -4,6 +4,7 @@ from pathlib import Path
 
 from roasterbro.utils.constants import DEPENDENCY_MAP, FRAMEWORK_SIGNATURES
 
+
 pattern = r"(==|>=|<=|~=|!=)"
 
 
@@ -21,12 +22,13 @@ def clean_name(dependencies: list) -> list:
 
 
 def dependencies_analyzer(files: list) -> dict[str, Any]:
-    """Analyze the dependencies and find relevant ecosystem, 
-    package_manager, dependencies, framework, lockfile etc. 
+    """Analyze dependencies and find ecosystem, package manager,
+    dependencies, frameworks, and lockfiles.
     """
+
     dependency_files = DEPENDENCY_MAP.keys()
     dep = {}
-    
+
     for dep_file in dependency_files:
         matching_files = [
             f for f in files
@@ -51,7 +53,8 @@ def dependencies_analyzer(files: list) -> dict[str, Any]:
                 pm = default_pm
 
             parse_result = parser(actual_file_path)
-            dependencies = parse_result.get('dependencies' , [])
+
+            dependencies = parse_result.get("dependencies", [])
             cleaned_dependencies = clean_name(dependencies)
 
             framework = []
@@ -60,32 +63,39 @@ def dependencies_analyzer(files: list) -> dict[str, Any]:
 
             if isinstance(ecosystem, str):
                 ecosystem = [ecosystem.lower()]
-
-            if isinstance(ecosystem, list):
+            elif isinstance(ecosystem, list):
                 ecosystem = [x.lower() for x in ecosystem]
+            else:
+                ecosystem = []
 
             for eco in ecosystem:
                 info = FRAMEWORK_SIGNATURES.get(eco, {})
 
                 for clean_dep in cleaned_dependencies:
-                    if clean_dep not in info:
-                        continue
+                    for framework_name, framework_info in info.items():
+                        packages = framework_info.get("packages", [])
 
-                    framework_info = info[clean_dep]
+                        if clean_dep not in packages:
+                            continue
 
-                    category = framework_info.get("category", "")
-                    overrides = framework_info.get("overrides", [])
+                        category = framework_info.get("category", "")
+                        overrides = framework_info.get("overrides", [])
 
-                    framework.append(clean_dep)
-                    framework_categories.append(category)
+                        framework.append(framework_name)
+                        framework_categories.append(category)
 
-                    overridden_frameworks.update(
-                        x.lower() for x in overrides
-                    )
+                        overridden_frameworks.update(
+                            x.lower() for x in overrides
+                        )
+
+                        break
 
             filtered = [
                 (fw, category)
-                for fw, category in zip(framework, framework_categories)
+                for fw, category in zip(
+                    framework,
+                    framework_categories
+                )
                 if fw.lower() not in overridden_frameworks
             ]
 
@@ -96,11 +106,14 @@ def dependencies_analyzer(files: list) -> dict[str, Any]:
                 actual_file_path: {
                     "ecosystem": ecosystem,
                     "package_manager": pm,
-                    "dependencies" :  cleaned_dependencies,
-                    "dep_count" : parse_result.get('dependency_count' , 0),
+                    "dependencies": cleaned_dependencies,
+                    "dep_count": parse_result.get(
+                        "dependency_count",
+                        0
+                    ),
                     "framework": set(framework),
-                    "framework_categories": set(framework_categories)
+                    "framework_categories": set(framework_categories),
                 }
             })
-            
+
     return dep
