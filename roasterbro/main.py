@@ -33,7 +33,7 @@ BANNER = r"""
 │                     |_|  \_\___/ \__,_|___/\__\___|_|  |_.__/|_|  \___/                                │
 │                                                                                                        │
 │           A CLI that scans your codebase, interrogates you and then roasts it. - 0.1.0                 │
-│                                   Made by - Gaohar Imran                                                │
+│                                   Made by - Gaohar Imran                                               │
 │                                                                                                        │
 ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 """
