@@ -1,5 +1,4 @@
 # CLI framework and packaging
-setuptools==83.0.0
 click==8.4.2
 
 # Python utilities and configuration
