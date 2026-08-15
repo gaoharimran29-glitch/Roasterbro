@@ -215,7 +215,6 @@ EXTENSION_LANGUAGE_MAP = {
     ".ini": "INI Config",
     ".cfg": "Config",
     ".conf": "Config",
-    ".env": "Environment Config",
     ".properties": "Java Properties",
 
     # Documentation & Templating
@@ -246,7 +245,6 @@ EXTENSION_LANGUAGE_MAP = {
     ".tf": "Terraform",
     ".tfvars": "Terraform Vars",
     ".hcl": "HCL",
-    ".dockerfile": "Dockerfile",
     ".bicep": "Bicep",
 
     # Database & Query Languages
