@@ -1,6 +1,7 @@
 import click
 import json
 import asyncio
+from pathlib import Path
 
 from roasterbro.utils.helpers import scan_and_validate
 from roasterbro.utils.config import get_llm
@@ -183,6 +184,7 @@ def whitespace(path: str | None) -> None:
 )
 def fullscan(path: str | None, json_path: str | None) -> None:
     """Run a combined full scan (with optional JSON export"""
+    json_path = Path(json_path).resolve() if json_path else None
     cwd = scan_and_validate(path, "fullscan")
     scanning_result = repo_scan_findings(cwd)
     print_scan_output(scanning_result)
