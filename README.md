@@ -7,7 +7,7 @@
 
 **Version 0.1.0** · Made by [Gaohar Imran](https://github.com/gaoharimran29-glitch)
 
-[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![Click](https://img.shields.io/badge/built%20with-Click-informational)](https://click.palletsprojects.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#license)
 [![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)](#)
@@ -20,6 +20,7 @@
  
 - [Overview](#-overview)
 - [Features](#-features)
+- [Supported Languages & Ecosystems](#-supported-languages--ecosystems)
 - [Installation](#️-installation)
 - [Usage](#-usage)
 - [Commands](#-commands)
@@ -33,7 +34,9 @@
   - [fullscan](#fullscan--everything-at-once)
   - [models](#models--detect-available-llms)
   - [roast](#roast--roast-your-repo-)
+- [LLM Support](#-llm-support)
 - [Examples](#-examples)
+- [Known Limitations](#-known-limitations)
 - [Project Structure](#️-project-structure)
 - [Contributing](#-contributing)
 - [License](#-license)
@@ -47,13 +50,15 @@
 
 Think of it as part static-analysis tool, part linter, part stand-up comedian.
 
+> **Scope note:** RoasterBro's language detection works on virtually any codebase (it's extension-based). Its *dependency* and *framework* detection is currently scoped to **Python, JavaScript/TypeScript (Node.js), Rust, and Go** — see [Supported Languages & Ecosystems](#-supported-languages--ecosystems) below for exactly what that covers today.
+
 ---
 
 ## ✨ Features
 
 * 🔍 **Repo Scan** — Quick overview of your project structure and project maturity signals
-* 🌐 **Language Detection** — See every language used across your codebase
-* 📦 **Dependency Analysis** — Analyze dependencies, package managers, frameworks, and ecosystems
+* 🌐 **Language Detection** — Recognizes 90+ file extensions across most mainstream languages
+* 📦 **Dependency Analysis** — Parses `package.json`, `pyproject.toml`, `requirements.txt`, `Cargo.toml`, and `go.mod` for dependencies, package managers, and frameworks
 * 📊 **File Statistics** — Inspect LOC, file sizes, largest files, empty files, and test files
 * 🌱 **Git Analysis** — Insights pulled straight from your repository's Git history
 * 🧹 **Whitespace Scanner** — Hunt down trailing whitespace, file by file, line by line
@@ -68,6 +73,28 @@ Think of it as part static-analysis tool, part linter, part stand-up comedian.
 
 ---
 
+## 🧬 Supported Languages & Ecosystems
+
+**Language detection** (`langs`) is extension-based and works on any codebase — it recognizes 90+ file extensions spanning most mainstream languages (Python, JavaScript/TypeScript, Go, Rust, Java, C/C++, Ruby, PHP, and many more). This part has no dependency-file requirement and works everywhere.
+
+**Dependency and framework detection** (`deps`, and the dependency section of `fullscan`/`roast`) is more targeted. RoasterBro currently reads these manifest files:
+
+| Ecosystem | Manifest file(s) read | Package managers detected |
+|---|---|---|
+| Python | `pyproject.toml`, `requirements.txt` | pip, pip/pyproject, poetry, pipenv |
+| JavaScript / TypeScript (Node.js) | `package.json` | npm, yarn, pnpm |
+| Rust | `Cargo.toml` | cargo |
+| Go | `go.mod` | go modules |
+
+Within those ecosystems, these frameworks are currently recognized from your dependency list:
+
+- **Python:** Django, FastAPI, Flask
+- **JavaScript/TypeScript:** Next.js, NestJS, Express, React
+
+**Not yet supported:** manifests for other ecosystems (e.g. `composer.json` for PHP, `Gemfile` for Ruby, `pom.xml`/`build.gradle` for Java) aren't parsed yet, so `deps` won't report dependencies for those repos even though `langs` will still correctly detect the source files. If your project uses one of these, `deps`/`fullscan` will simply show no dependency file found — that's an expected current limitation, not a bug. Contributions adding new ecosystem parsers are very welcome (see [Contributing](#-contributing)).
+
+---
+
 ## 🛠️ Installation
 
 ```bash
@@ -79,7 +106,7 @@ cd Roasterbro
 pip install -e .
 ```
 
-> Requires **Python 3.10+**.
+> Requires **Python 3.11+** (RoasterBro's TOML parsing uses the `tomllib` standard-library module, added in 3.11).
 
 Once installed, the `roasterbro` command will be available in your terminal.
 
@@ -88,9 +115,10 @@ Once installed, the `roasterbro` command will be available in your terminal.
 ## 🚀 Usage
 
 ```bash
-roasterbro [COMMAND] [PATH] [OPTIONS]
+roasterbro COMMAND PATH [OPTIONS]
 ```
 
+> `PATH` is **required** for every command except `models` — point it at the repository you want to analyze. Use `.` to scan the current directory.
 
 Running `roasterbro` with no arguments displays the banner and a quick pointer to the help menu:
 
@@ -138,70 +166,70 @@ Every command (except `models`) accepts a required `PATH` argument pointing to t
 
 ### `scan` — Basic Repo Info
 ```bash
-roasterbro scan [PATH]
-roasterbro -s
+roasterbro scan PATH
+roasterbro -s .
 ```
 Gives you a snapshot summary of the repository: files, directories, and general structure.
 
 ### `gitanalyze` — Git Insights
 ```bash
-roasterbro gitanalyze [PATH]
-roasterbro -g
+roasterbro gitanalyze PATH
+roasterbro -g .
 ```
-Analyzes the repository's git history and metadata.
+Analyzes the repository's git history and metadata. `PATH` must itself be the root of a git repository (RoasterBro does not search parent directories for one).
 
 ### `langs` — Language Breakdown
 ```bash
-roasterbro langs [PATH]
-roasterbro -l
+roasterbro langs PATH
+roasterbro -l .
 ```
-Detects and lists every programming language present in the codebase.
+Detects and lists every recognized programming language present in the codebase, by file extension.
 
 ### `deps` — Dependency Analysis
 ```bash
-roasterbro deps [PATH]
-roasterbro -d
+roasterbro deps PATH
+roasterbro -d .
 ```
-Scans the repo and reports the dependencies it relies on.
+Scans the repo and reports the dependencies it relies on. See [Supported Languages & Ecosystems](#-supported-languages--ecosystems) for which manifest files are currently parsed.
 
 ### `filestats` — File Statistics
 ```bash
-roasterbro filestats [PATH]
-roasterbro -fs
+roasterbro filestats PATH
+roasterbro -fs .
 ```
 Reports file- and directory-level metrics, including whether test coverage appears to exist.
 
 ### `whitespace` — Whitespace Scanner
 ```bash
-roasterbro whitespace [PATH]
-roasterbro -w
+roasterbro whitespace PATH
+roasterbro -w .
 ```
 Flags every file and line number containing trailing whitespace.
 
 ### `fullscan` — Everything at Once
 ```bash
-roasterbro fullscan [PATH] [--json OUTPUT.json]
-roasterbro -f --json results.json
+roasterbro fullscan PATH [--json OUTPUT.json]
+roasterbro -f . --json results.json
 ```
 Runs `scan`, `langs`, `deps`, `filestats`, and `gitanalyze` together and prints a combined report. Use `--json` to save the full combined results to a JSON file.
 
 | Option | Description |
 |---|---|
-| `--json <path>` | Save the combined scan output to a JSON file |
+| `--json <path>` | Save the combined scan output to a JSON file. Resolved relative to your **current shell location**, not the scanned repo. |
 
 ### `models` — Detect Available LLMs
 ```bash
 roasterbro models
 roasterbro -m
 ```
-Detects locally configured LLM setups and cloud provider API keys available in your environment.
+Detects locally configured LLM setups and cloud provider API keys available in your environment. This is the only command that doesn't take a `PATH`.
 
 ### `roast` — Roast Your Repo 🔥
 ```bash
-roasterbro roast [PATH] [--provider PROVIDER] [--llm MODEL]
-roasterbro -r --provider google --llm gemini-2.5-flash-lite
+roasterbro roast PATH [--provider PROVIDER] [--llm MODEL]
+roasterbro -r . --provider google --llm gemini-2.5-flash-lite
 ```
-Runs a full scan and hands the results to an LLM, which then proceeds to roast your codebase based on what it finds.
+Runs a full scan and hands the results to an LLM, which then proceeds to roast your codebase based on what it finds. Requires a usable LLM — either a running Ollama instance or a configured cloud provider API key. Run `roasterbro models` first if you're not sure what's available.
 
 | Option | Default | Description |
 |---|---|---|
@@ -255,21 +283,38 @@ This command helps identify available local LLM configurations and configured on
 ## 💡 Examples
 
 ```bash
-# Scan the current directory
-roasterbro scan
+# Scan the current directory (the "." is required)
+roasterbro scan .
 
 # Analyze git history for a specific project
 roasterbro gitanalyze ~/projects/my-app
 
-# Get a full report and save it as JSON
-roasterbro fullscan . --json report.json
+# Get a full report and save it as JSON (saved relative to where you run this, not to my-app)
+roasterbro fullscan ~/projects/my-app --json report.json
 
 # See which LLM providers you have configured
 roasterbro models
 
 # Get roasted using Google's Gemini
 roasterbro roast . --provider google --llm gemini-2.5-flash-lite
+
+# Get roasted using a local Ollama model instead
+roasterbro roast . --provider ollama --llm llama3.2:3b
 ```
+
+---
+
+## ⚠️ Known Limitations
+
+Being upfront about what RoasterBro doesn't do yet:
+
+- **Dependency/framework detection is scoped to Python, JS/TS, Rust, and Go.** See [Supported Languages & Ecosystems](#-supported-languages--ecosystems). Other ecosystems (PHP, Ruby, Java, .NET, etc.) are correctly language-detected by `langs` but won't show up in `deps`.
+- **`gitanalyze` looks for a `.git` directory at the exact `PATH` you give it** — it doesn't walk up through parent directories. Point it at your repo root.
+- **`roast` needs a working LLM.** Either Ollama running locally, or an API key for one of the supported cloud providers (OpenAI, Groq, Google, Mistral, Anthropic) set in your environment. Run `roasterbro models` to check what's available before running `roast`.
+- **`--json` on `fullscan` resolves relative to your current shell directory**, not the repository you're scanning — so `roasterbro fullscan ~/other-repo --json out.json` writes `out.json` where you ran the command, not inside `~/other-repo`.
+- **"Total Size" in `scan`/`fullscan` reflects the full directory size on disk**, including files RoasterBro otherwise excludes from its file/dependency analysis (e.g. `.git` history, `node_modules` if present). File and directory *counts* are filtered; the size figure currently is not.
+
+Found something else? Please open an issue — see [Contributing](#-contributing).
 
 ---
 
