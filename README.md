@@ -313,6 +313,7 @@ Being upfront about what RoasterBro doesn't do yet:
 - **`roast` needs a working LLM.** Either Ollama running locally, or an API key for one of the supported cloud providers (OpenAI, Groq, Google, Mistral, Anthropic) set in your environment. Run `roasterbro models` to check what's available before running `roast`.
 - **`--json` on `fullscan` resolves relative to your current shell directory**, not the repository you're scanning — so `roasterbro fullscan ~/other-repo --json out.json` writes `out.json` where you ran the command, not inside `~/other-repo`.
 - **"Total Size" in `scan`/`fullscan` reflects the full directory size on disk**, including files RoasterBro otherwise excludes from its file/dependency analysis (e.g. `.git` history, `node_modules` if present). File and directory *counts* are filtered; the size figure currently is not.
+- **"Created At" is exact on macOS but approximate on Linux.** macOS exposes a true file-creation timestamp (`st_birthtime`), which RoasterBro uses when available. Most Linux filesystems don't track creation time at all, so on Linux this field falls back to `st_ctime` — the last time the directory's *metadata* changed (permissions, ownership, a rename, etc.), not when it was actually created. RoasterBro detects this automatically and labels the field `Created At (approx.*)` with an inline note whenever it's using the fallback, so you'll always know which one you're looking at.
 
 Found something else? Please open an issue — see [Contributing](#-contributing).
 

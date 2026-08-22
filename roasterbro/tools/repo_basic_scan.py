@@ -107,6 +107,14 @@ def repo_scan_findings(cwd: Path) -> dict[str, Any]:
 
     stat = cwd.stat()
 
+    # True file-creation time is only available on some platforms
+    # (e.g. macOS via st_birthtime). On Linux, most filesystems don't
+    # track creation time at all, so we fall back to st_ctime - which is
+    # the last time the *metadata* changed (permissions, ownership,
+    # rename, etc.), NOT when the directory was created. We surface
+    # `created_at_is_exact` so callers/formatters can label this
+    # accurately instead of silently presenting an approximation as fact.
+    created_at_is_exact = hasattr(stat, 'st_birthtime')
     created_time = getattr(stat, 'st_birthtime', stat.st_ctime)
     formatted_date = datetime.fromtimestamp(created_time).strftime('%Y-%m-%d %H:%M:%S')
     total_bytes = sum(f.stat().st_size for f in cwd.rglob('*') if f.is_file())
@@ -150,6 +158,7 @@ def repo_scan_findings(cwd: Path) -> dict[str, Any]:
         "files":files,
         "directories":directories,
         "created_at": formatted_date,
+        "created_at_is_exact": created_at_is_exact,
         "size": round(size_in_mb, 2),
         "imp_file": imp_file,
         "suspicious_files": suspicous_file,

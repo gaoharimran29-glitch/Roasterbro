@@ -1,13 +1,24 @@
 import click
 
+
 def print_scan_output(scanning_result: dict) -> None:
     """Prints a colourful, structured summary of the scan command using click."""
+
     click.secho(f"📄 Files Found: ", fg="cyan", nl=False)
     click.secho(f"{len(scanning_result.get("files", 0))}", fg="yellow", bold=True)
     click.secho(f"📁 Directories Found: ", fg="cyan", nl=False)
     click.secho(f"{len(scanning_result.get("directories", 0))}", fg="yellow", bold=True)
-    click.secho("📅 Created At: ", fg="cyan", nl=False)
+    created_at_is_exact = scanning_result.get("created_at_is_exact", True)
+    created_at_label = "📅 Created At: " if created_at_is_exact else "📅 Created At (approx.*): "
+    click.secho(created_at_label, fg="cyan", nl=False)
     click.secho(f"{scanning_result.get("created_at", None)}", fg="yellow", bold=True)
+    if not created_at_is_exact:
+        click.secho(
+            "   * This platform has no true file-creation timestamp, so this is the "
+            "last metadata-change time (st_ctime), not the actual creation date.",
+            fg="bright_black"
+        )
+    
     click.secho("💾 Total Size: ", fg="cyan", nl=False)
     click.secho(f"{scanning_result.get("size", 0)} MB", fg="yellow", bold=True)
     click.secho("─" * 50, fg="bright_black")
