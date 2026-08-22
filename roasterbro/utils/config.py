@@ -1,5 +1,6 @@
 import os
 import click
+import warnings
 from dotenv import load_dotenv
 from typing import NoReturn
 from pydantic import ValidationError
@@ -48,6 +49,17 @@ def get_llm(provider: str, model_name: str) -> BaseChatModel:
         kwargs["base_url"] = "http://localhost:11434"
 
     try:
+        # Some provider SDKs (e.g. ChatGroq) don't accept `top_p` as a
+        # native constructor field and reroute it into model_kwargs,
+        # emitting a benign-but-noisy UserWarning. Silence just that one
+        # known, harmless warning so first-run output stays clean without
+        # hiding other, potentially useful warnings.
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                message=r"(?s).*top_p.*model_kwargs.*",
+                category=UserWarning,
+            )
         return config["class"](**kwargs)
 
     except ValidationError as e:
