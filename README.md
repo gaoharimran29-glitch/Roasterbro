@@ -372,7 +372,7 @@ roasterbro/
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for the development setup, project structure, and a guide to adding support for a new ecosystem or language — that's currently the highest-value place to contribute.
+Contributions, issues, and feature requests are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for the development setup, project structure, and a guide to adding support for a new ecosystem or language — that's currently the highest-value place to contribute. All participants are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 Quick version:
 

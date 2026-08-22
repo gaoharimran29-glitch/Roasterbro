@@ -20,6 +20,8 @@ Thanks for considering a contribution — bug reports, docs fixes, and new ecosy
 
 ## Before You Start
 
+All participants are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md) — the short version: roast the code, not the person.
+
 RoasterBro is early (`0.1.0`) and the scope is intentionally limited right now — see the [Known Limitations](README.md#-known-limitations) and [Supported Languages & Ecosystems](README.md#-supported-languages--ecosystems) sections of the README before assuming something is broken. A lot of "missing" behavior (e.g. no PHP/Ruby/Java dependency parsing) is a known gap, not a bug — and it's a great place to contribute.
 
 If you're planning something larger than a small fix (a new command, a big refactor, a new output format), please open an issue first to discuss the approach before writing code. Smaller fixes and new ecosystem parsers can go straight to a PR.
