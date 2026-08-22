@@ -87,61 +87,142 @@ def parse_node(file_path: Path) -> Dict[str , Any]:
         }
 
 
-def parse_pyproject(file_path: Path) -> Dict[str , Any]:
-    """Parse the pyproject.toml file, then extract and return dependencies from it."""
+def parse_pyproject(file_path: Path) -> Dict[str, Any]:
+    """Parse pyproject.toml and extract production and development dependencies."""
+
+    result = {
+        "success": True,
+        "dependency_count": 0,
+        "dependencies": [],
+        "error": None,
+    }
+
     file_path = Path(file_path)
-    if not file_path.exists() or not file_path.is_file():
-        return {
-            "dependency_count": 0,
-            "dependencies": []
-        }
-    
-    with open(file_path , "rb") as f:
-        try:
+
+    if not file_path.exists():
+        result["success"] = False
+        result["error"] = f"File does not exist: {file_path}"
+        return result
+
+    if not file_path.is_file():
+        result["success"] = False
+        result["error"] = f"Path is not a file: {file_path}"
+        return result
+
+    try:
+        with file_path.open("rb") as f:
             content = tomllib.load(f)
-        except tomllib.TOMLDecodeError as e:
-            return {
-                "Success" : False ,
-                "Error" : str(e)
-            }
+    except tomllib.TOMLDecodeError as e:
+        result["success"] = False
+        result["error"] = f"Invalid TOML: {e}"
+        return result
+    except OSError as e:
+        result["success"] = False
+        result["error"] = f"Unable to read file: {e}"
+        return result
 
-    if "project" in content:
-        # 1. PEP 621 Production Dependencies
-        raw_deps = content["project"].get("dependencies", [])
-        # 2. PEP 621 Dev / Optional Dependencies
-        opt_deps_dict = content["project"].get("optional-dependencies", {})
-        raw_dev_deps = []
-        for group_deps in opt_deps_dict.values():
-            raw_dev_deps.extend(group_deps)
+    dependencies: list[str] = []
 
-        dependencies = raw_deps + raw_dev_deps
-        return {
-                "dependency_count": len(dependencies),
-                "dependencies": dependencies
-            }
+    # PEP 621: [project]
+    project = content.get("project", {})
 
-    elif "tool" in content and "poetry" in content["tool"]:
-        poetry_data = content["tool"]["poetry"]
+    if isinstance(project, dict):
 
-        prod_dict = poetry_data.get("dependencies", {})
-        raw_deps = [pkg for pkg in prod_dict.keys() if pkg != "python"]
+        # Production dependencies
+        raw_deps = project.get("dependencies", [])
 
-        dev_dict = (poetry_data.get("group", {}).get("dev", {}).get("dependencies", {}))
-        if not dev_dict:
-            dev_dict = poetry_data.get("dev-dependencies", {})
+        if isinstance(raw_deps, list):
+            dependencies.extend(
+                dep for dep in raw_deps
+                if isinstance(dep, str)
+            )
 
-        raw_dev_deps = list(dev_dict.keys())
-        dependencies = raw_deps + raw_dev_deps
-        return {
-                "dependency_count": len(dependencies),
-                "dependencies": dependencies
-            }
+        # Optional dependencies / extras
+        optional_dependencies = project.get(
+            "optional-dependencies",
+            {}
+        )
 
-    else:
-        return {
-            "Success" : False ,
-            "Error" : "Neither standard [project] nor [tool.poetry] sections found"
-        }
+        if isinstance(optional_dependencies, dict):
+            for group_deps in optional_dependencies.values():
+                if isinstance(group_deps, list):
+                    dependencies.extend(
+                        dep for dep in group_deps
+                        if isinstance(dep, str)
+                    )
+
+    # PEP 735: [dependency-groups]
+    dependency_groups = content.get("dependency-groups", {})
+
+    if isinstance(dependency_groups, dict):
+        for group_deps in dependency_groups.values():
+
+            if isinstance(group_deps, list):
+                dependencies.extend(
+                    dep for dep in group_deps
+                    if isinstance(dep, str)
+                )
+
+    # Poetry: [tool.poetry]
+    tool = content.get("tool", {})
+
+    if isinstance(tool, dict):
+        poetry = tool.get("poetry", {})
+
+        if isinstance(poetry, dict):
+
+            # Production dependencies
+            poetry_dependencies = poetry.get(
+                "dependencies",
+                {}
+            )
+
+            if isinstance(poetry_dependencies, dict):
+                dependencies.extend(
+                    package
+                    for package in poetry_dependencies
+                    if package != "python"
+                )
+
+            # Modern Poetry dev dependencies
+            groups = poetry.get("group", {})
+
+            if isinstance(groups, dict):
+                for group in groups.values():
+
+                    if not isinstance(group, dict):
+                        continue
+
+                    group_dependencies = group.get(
+                        "dependencies",
+                        {}
+                    )
+
+                    if isinstance(group_dependencies, dict):
+                        dependencies.extend(
+                            package
+                            for package in group_dependencies
+                        )
+
+            # Legacy Poetry dev dependencies
+            dev_dependencies = poetry.get(
+                "dev-dependencies",
+                {}
+            )
+
+            if isinstance(dev_dependencies, dict):
+                dependencies.extend(
+                    package
+                    for package in dev_dependencies
+                )
+
+    # Remove duplicates while preserving order
+    dependencies = list(dict.fromkeys(dependencies))
+
+    result["dependencies"] = dependencies
+    result["dependency_count"] = len(dependencies)
+
+    return result
 
 
 def parse_cargo(file_path: Path) -> Dict[str , Any]:
