@@ -19,7 +19,7 @@ def print_git_output(git_info: dict) -> None:
         ("Total Contributors", git_info.get("Total Contributors", 0)),
         ("Total Commits", git_info.get("Total Commits", 0)),
         ("Last Commit Date", git_info.get("Last Commit date")),
-        ("Days Since Last Commit", git_info.get("Days Since Last Commit", 0)),
+        ("Last Commit", git_info.get("Last Commit", 0)),
     ]
 
     max_len = max(len(label) for label, _ in metadata_rows)
@@ -28,7 +28,7 @@ def print_git_output(git_info: dict) -> None:
     for label, value in metadata_rows:
         click.secho(f"  {label.ljust(branch_label_len)} : ", fg="cyan", nl=False)
 
-        if label == "Days Since Last Commit" and isinstance(value, int):
+        if label == "Last Commit" and isinstance(value, int):
             color = "green" if value <= 30 else "yellow" if value <= 180 else "red"
             click.secho(f"{value} days ago", fg=color, bold=True)
         else:

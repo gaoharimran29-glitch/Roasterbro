@@ -3,6 +3,42 @@ from typing import Any
 from datetime import datetime
 
 
+def humanize_timedelta(delta):
+    seconds = int(delta.total_seconds())
+
+    if seconds < 60:
+        return f"{seconds} sec ago"
+
+    minutes = seconds // 60
+    if minutes < 60:
+        if minutes == 1:
+            return "1 min ago"
+        return f"{minutes} mins ago"
+
+    hours = minutes // 60
+    if hours < 24:
+        if hours == 1:
+            return "1 hr ago"
+        return f"{hours} hrs ago"
+
+    days = hours // 24
+    if days < 30:
+        if days == 1:
+            return "1 day ago"
+        return f"{days} days ago"
+
+    months = days // 30
+    if months < 12:
+        if months == 1:
+            return "1 month ago"
+        return f"{months} months ago"
+
+    years = days // 365
+    if years == 1:
+        return "1 yr ago"
+    return f"{years} yrs ago"
+
+
 def analyze_git_repository(path: str) -> dict[str, Any]:
     """Analyze hidden git file and return git related metadata"""
     try:
@@ -24,20 +60,21 @@ def analyze_git_repository(path: str) -> dict[str, Any]:
 
             today = datetime.now()
             age_diff = today - last_commit_date
-            days_ago = age_diff.days
+            last_commit_relative = humanize_timedelta(age_diff)
+        
         else:
             commit_count = 0
             last_commit_date = None
             human_readable_date = "No commits yet"
             unique_contributors_count = 0
-            days_ago = None
 
         local_branches = git_repo.branches
-        remote_branches = [
-            ref
-            for remote in git_repo.remotes
-            for ref in remote.refs
-        ]
+
+        # Update remote-tracking refs and remove stale branches
+        git_repo.remotes.origin.fetch(prune=True)
+
+        remote_branches = list(git_repo.remotes.origin.refs)
+
         true_remote_branches = [
             branch
             for branch in remote_branches
@@ -50,7 +87,7 @@ def analyze_git_repository(path: str) -> dict[str, Any]:
             "Total Contributors": unique_contributors_count,
             "Total Commits": commit_count,
             "Last Commit date": human_readable_date,
-            "Days Since Last Commit": days_ago,
+            "Last Commit": last_commit_relative,
             "Local Branches": local_branches,
             "Remote Branches": true_remote_branches,
             "No. of local branches": len(local_branches),
