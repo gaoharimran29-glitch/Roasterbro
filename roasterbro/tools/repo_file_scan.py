@@ -1,16 +1,24 @@
 import os
 
+from roasterbro.tools.repo_basic_scan import is_test_path
 
 def file_metrics(files: list , has_test: bool , directories: list) -> dict[str , int]:
     """Analyze the files of the repo and return deep metrics"""
     file_lines = {}
     file_sizes = {}
     for file in files:
-        with open(file, "r" , encoding='utf-8' , errors='ignore') as f:
-            line_count = sum(1 for line in f)
-            size = os.path.getsize(file)
-            file_lines[file] = line_count
-            file_sizes[file] = size
+        try:
+            with open(file, "r" , encoding='utf-8' , errors='ignore') as f:
+                line_count = sum(1 for line in f)
+                size = os.path.getsize(file)
+                file_lines[file] = line_count
+                file_sizes[file] = size
+
+        except (FileNotFoundError, PermissionError, IsADirectoryError, OSError):
+            # File vanished, is unreadable, or is some non-regular file
+            # (broken symlink, socket, etc.) - skip it instead of crashing.
+            continue
+
 
     if not file_lines:
         return {
@@ -30,7 +38,13 @@ def file_metrics(files: list , has_test: bool , directories: list) -> dict[str ,
     
     total_loc = sum(file_lines.values())
     largest_loc_file = max(file_lines.values())
-    readme_loc = file_lines.get("README.md")
+    # Case-insensitive lookup so "readme.md" / "Readme.md" etc. still
+    # resolve, and restricted to the repo root (not a nested docs/README.md)
+    # to match check_important_files()'s definition of "the README".
+    readme_loc = next(
+        (loc for path, loc in file_lines.items() if path.lower() == "readme.md"),
+        None
+    )
 
     empty_files = []
     files_gt_500loc = []
@@ -53,7 +67,7 @@ def file_metrics(files: list , has_test: bool , directories: list) -> dict[str ,
     test_files_count = 0
 
     if has_test:
-        test_files = [d for d in directories if "test" in d.lower()] +  [d for d in files if "test" in d.lower()]
+        test_files = [d for d in directories if is_test_path(d)] + [f for f in files if is_test_path(f)]
         test_files_count = len(test_files)
 
     return {
