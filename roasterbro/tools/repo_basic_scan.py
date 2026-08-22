@@ -8,6 +8,18 @@ from pathlib import Path
 from roasterbro.utils.constants import EXCLUDED_DIRS, SUSPICIOUS_PATTERNS, EXCLUDED_EXTENSIONS
 
 
+TEST_PATTERN = re.compile(r"(^|[_.\-/])(test|spec)s?([_.\-/]|$)")
+
+
+def is_test_path(path: str) -> bool:
+    """Word-boundary aware check for whether a path looks like a test
+    file/directory. Avoids false positives like 'latest_report.py' or
+    'attestation.md' that a plain 'test' in path substring check would
+    incorrectly flag.
+    """
+    return bool(TEST_PATTERN.search(path.lower()))
+
+
 def check_important_files(files: list[str]) -> dict[str, bool]:
     """Check whether basic important files and directories are present in the repo."""
     
@@ -56,19 +68,29 @@ def check_important_files(files: list[str]) -> dict[str, bool]:
             results['CODEOWNER'] = True
         elif f == ".github/funding.yml":
             results['FUNDING.yml'] = True     
-        elif "test" in f:
+        elif is_test_path(f):
             results["Test_Files"] = True
 
     return results
 
 
 def check_suspicious_file(files: list) -> list:
-    """Check for the suspicious files (e.g. .env ) in the repo"""
+    """Check for the suspicious files (e.g. .env) in the repo.
+
+    Matches against the file's own basename (exact match, or basename
+    startswith "pattern.") rather than a raw substring search across the
+    whole path - a plain 'pattern in path' substring check false-positives
+    on innocuous files like 'app.environment.json' matching '.env'.
+    """
     suspicious_files = []
     for file in files:
         f = os.path.normpath(file).lower().replace("\\", "/")
-        if any(pattern in f for pattern in SUSPICIOUS_PATTERNS):
-            suspicious_files.append(f)
+        basename = f.rsplit("/", 1)[-1]
+
+        for pattern in SUSPICIOUS_PATTERNS:
+            if basename == pattern or basename.startswith(f"{pattern}."):
+                suspicious_files.append(f)
+                break
 
     return suspicious_files
 
@@ -101,6 +123,13 @@ def repo_scan_findings(cwd: Path) -> dict[str, Any]:
             directories.append(str(item.relative_to(cwd)))
             continue
 
+        if not item.is_file():
+            # Skips broken/dangling symlinks, sockets, devices, etc. -
+            # is_dir() and is_file() both return False for these, so
+            # without this check they'd fall through into `files` and
+            # crash later when something tries to open() them.
+            continue
+
         if item.suffix.lower() in EXCLUDED_EXTENSIONS:
             continue
 
@@ -110,7 +139,7 @@ def repo_scan_findings(cwd: Path) -> dict[str, Any]:
 
     has_test = (
     any(d.lower() in test_keywords for d in directories)
-    or any(re.search(r"(^|[_\.\-])(test|spec)s?([_\.\-]|$)", f.lower()) for f in files)
+    or any(is_test_path(f) for f in files)
     )
 
     imp_file = check_important_files(files=files)
