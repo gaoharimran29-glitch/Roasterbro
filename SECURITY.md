@@ -41,9 +41,13 @@ When you run `roast` (or `fullscan`/`roast` with a cloud `--provider`), RoasterB
 
 - Detected languages and their file counts
 - Dependency names and package managers (from `deps`)
-- File statistics (LOC, largest files, empty files, test file paths)
 - Git metadata (commit count, contributor count, branch names, last-commit date)
+- The **absolute local filesystem path** of the directory you scanned (this can reveal your username and local directory structure, e.g. `/Users/alice/projects/secret-startup`)
+- A **per-file line-count breakdown for every file in the repo** — i.e. every relative file path in your project, paired with its line count — not just aggregate statistics
+- Lists of **relative file paths** for empty files, files over 500/1000 LOC, and detected test files
 - **Filenames** flagged by suspicious-file detection (e.g. the fact that a `.env` file exists) — but not their contents
+
+In short: **every filename in your project's tracked file tree is sent to the selected LLM provider**, not just suspicious ones — along with the absolute path to the scanned directory. If you're scanning a private, unreleased, or otherwise sensitive codebase and don't want your file tree or local path leaving your machine, use `--provider ollama` with a local model, or inspect `fullscan --json out.json` first to see exactly what would be included.
 
 It does **not** send full file contents, secret values, or environment variable values.
 
