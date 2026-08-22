@@ -18,7 +18,6 @@ from roasterbro.prompts.facts_extract_prompt import EXTRACT_SYSTEM_PROMPT, EXTRA
 from roasterbro.prompts.questions_generate_prompt import QUESTION_SYSTEM_PROMPT, QUESTION_USER_PROMPT
 
 from roasterbro.models.roast_output_model import RagebaitResponse, FinalRoast, RepoFacts
-from langsmith import traceable
 
 
 def make_json_safe(obj: Any) -> Any:
@@ -68,7 +67,6 @@ def full_scan_for_roast(cwd: Path) -> dict[str, dict]:
     }
 
 
-@traceable(name="Roasterbro")
 async def generate_roast(scan_data: dict, llm: BaseChatModel) -> None:
     """Invoke the LLM, Prints a colourful, structured summary of the roast command using click."""
     scan_data = make_json_safe(scan_data)
