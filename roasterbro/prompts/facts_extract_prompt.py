@@ -20,6 +20,8 @@ RULES:
 - Do not treat missing information as proof that something does not exist.
 - Avoid generic or redundant facts. Every fact should provide a distinct
   roast opportunity.
+- Do NOT treat the mere presence of .env files as secret exposure. Local
+  repositories commonly contain .env files.
 
 Output only the structured result. Do not explain your reasoning.
 """
