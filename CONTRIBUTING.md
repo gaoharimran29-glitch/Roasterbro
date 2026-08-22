@@ -85,7 +85,8 @@ If you're fixing a display/wording issue, you probably want `output_formatter/` 
 2. Make your change. Keep the diff focused — unrelated formatting or renames make PRs harder to review.
 3. Run the affected command(s) against a few different real repos (see [Manual Testing](#manual-testing)) before opening a PR.
 4. Update `README.md` if you changed user-facing behavior (a flag, a default, a supported ecosystem, etc.) — stale docs are worse than no docs.
-5. Push and open a PR against `main`.
+5. Update CHANGELOG.md under the [Unreleased] section if your change introduces a new feature, changes existing behavior, fixes a bug, or removes functionality.
+6. Push and open a PR against `main`.
 
 ---
 

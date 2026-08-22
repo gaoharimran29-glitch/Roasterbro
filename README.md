@@ -363,6 +363,7 @@ roasterbro/
 ├── .env.example                         # Example environment variables
 ├── .gitignore                           # Git ignored files and directories
 ├── CONTRIBUTING.md                      # Contribution guide
+├── CHANGELOG.md                         # Track the new unreleased changes
 └── LICENSE                              # Project license
 
 ```
