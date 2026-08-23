@@ -7,6 +7,7 @@
 
 **Version 0.1.0** · Made by [Gaohar Imran](https://github.com/gaoharimran29-glitch)
 
+[![PyPI](https://img.shields.io/pypi/v/roasterbro.svg)](https://pypi.org/project/roasterbro/)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![Click](https://img.shields.io/badge/built%20with-Click-informational)](https://click.palletsprojects.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#license)
@@ -96,18 +97,23 @@ Within those ecosystems, these frameworks are currently recognized from your dep
 ---
 
 ## 🛠️ Installation
-
+ 
+**From PyPI (recommended):**
+ 
 ```bash
-# Clone the repository
+pip install roasterbro
+```
+ 
+**From source** (if you want the latest unreleased changes, or you're planning to contribute — see [CONTRIBUTING.md](CONTRIBUTING.md)):
+ 
+```bash
 git clone https://github.com/gaoharimran29-glitch/Roasterbro.git
 cd Roasterbro
-
-# Install dependencies
 pip install -e .
 ```
-
+ 
 > Requires **Python 3.11+** (RoasterBro's TOML parsing uses the `tomllib` standard-library module, added in 3.11).
-
+ 
 Once installed, the `roasterbro` command will be available in your terminal.
 
 ---
