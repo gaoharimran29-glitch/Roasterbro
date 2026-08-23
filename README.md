@@ -329,6 +329,9 @@ Found something else? Please open an issue — see [Contributing](#-contributing
 
 ```
 roasterbro/
+├── assets/
+│   ├── roasterbro-logo.svg             # Roasterbro Logo
+│
 ├── roasterbro/                         # Main Python package
 │   ├── models/                         # Pydantic models
 │   │   └── roast_output_model.py       # Roast output schema
@@ -370,6 +373,10 @@ roasterbro/
 ├── .gitignore                           # Git ignored files and directories
 ├── CONTRIBUTING.md                      # Contribution guide
 ├── CHANGELOG.md                         # Track the new unreleased changes
+├── SECURITY.md                          # Security Policy
+├── README.md                            # Project Documentation
+├── MANIFEST.in                          # Distribution file inclusion
+├── CODE_OF_CONDUCT.md                   # Contributor behavior guidelines
 └── LICENSE                              # Project license
 
 ```

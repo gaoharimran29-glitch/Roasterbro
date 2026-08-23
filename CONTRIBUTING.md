@@ -55,23 +55,55 @@ A quick map before you dive in:
 
 ```
 roasterbro/
-├── main.py                     # Click CLI entry point — commands live here
-├── tools/                      # Core scanning logic, one file per concern
-│   ├── repo_basic_scan.py      # File/dir walk, exclusions, important-file checks
-│   ├── repo_deps_scan.py       # Dependency + framework detection
-│   ├── repo_file_scan.py       # LOC, file size, empty/oversized file stats
-│   ├── repo_git_scan.py        # Git metadata via GitPython
-│   ├── repo_lang_scan.py       # Language detection by extension
-│   ├── repo_whitespace_scan.py # Trailing whitespace scanner
-│   ├── repo_roast_scan.py      # Orchestrates the LLM roast flow
-│   └── find_llm_models.py      # Ollama + cloud provider key discovery
-├── utils/
-│   ├── helpers.py               # Path validation, manifest-file parsers
-│   ├── config.py                 # LLM provider instantiation
-│   └── constants.py              # EXCLUDED_DIRS, EXTENSION_LANGUAGE_MAP, DEPENDENCY_MAP, FRAMEWORK_SIGNATURES
-├── output_formatter/            # Click-based pretty-printers, one per command
-├── prompts/                     # System/user prompts for the roast LLM calls
-└── models/                      # Pydantic schemas for structured LLM output
+├── assets/
+│   ├── roasterbro-logo.svg             # Roasterbro Logo
+│
+├── roasterbro/                         # Main Python package
+│   ├── models/                         # Pydantic models
+│   │   └── roast_output_model.py       # Roast output schema
+│   │
+│   ├── output_formatter/               # Pretty-printers for scan results
+│   │   ├── scan_output_formatter.py
+│   │   ├── git_output_formatter.py
+│   │   ├── lang_output_formatter.py
+│   │   ├── dep_output_formatter.py
+│   │   ├── filestats_output_formatter.py
+│   │   ├── whitespace_output_formatter.py
+│   │   └── model_output_formatter.py
+│   │
+│   ├── prompts/                        # Prompts used by LLMs
+│   │   ├── facts_extract_prompt.py
+│   │   ├── final_roast_prompt.py
+│   │   └── questions_generate_prompt.py
+│   │
+│   ├── tools/                          # Core repository scanning and analysis
+│   │   ├── repo_basic_scan.py          # Basic repository information
+│   │   ├── repo_deps_scan.py           # Dependency analysis
+│   │   ├── repo_file_scan.py           # File and directory analysis
+│   │   ├── repo_git_scan.py            # Git repository analysis
+│   │   ├── repo_lang_scan.py           # Programming language detection
+│   │   ├── repo_whitespace_scan.py     # Whitespace analysis
+│   │   ├── repo_roast_scan.py          # Repository roasting logic
+│   │   └── find_llm_models.py          # LLM model discovery
+│   │
+│   ├── utils/                          # Shared utilities and configuration
+│   │   ├── helpers.py                  # Path validation and scanning helpers
+│   │   ├── config.py                   # LLM provider/config resolution
+│   │   └── constants.py                # Project-wide constants
+│   │
+│   └── main.py                         # Click-based CLI entry point
+│
+├── setup.py                             # Package installation configuration
+├── requirements.txt                     # Python dependencies
+├── .env.example                         # Example environment variables
+├── .gitignore                           # Git ignored files and directories
+├── CONTRIBUTING.md                      # Contribution guide
+├── CHANGELOG.md                         # Track the new unreleased changes
+├── SECURITY.md                          # Security Policy
+├── README.md                            # Project Documentation
+├── MANIFEST.in                          # Distribution file inclusion
+├── CODE_OF_CONDUCT.md                   # Contributor behavior guidelines
+└── LICENSE                              # Project license
 ```
 
 If you're fixing a display/wording issue, you probably want `output_formatter/` or `prompts/`. If you're fixing detection logic, you probably want `tools/` or `constants.py`.
