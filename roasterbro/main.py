@@ -101,7 +101,8 @@ def main(ctx) -> None:
         "vulnerabilities, kindly report them to the developer. For assistance, "
         "run 'roasterbro --help' or 'roasterbro -h'.",
         fg="magenta", bold=True, underline=True
-    )
+        )
+        click.secho()
 
 
 @main.command()
