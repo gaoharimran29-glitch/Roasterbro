@@ -18,7 +18,8 @@
 ---
 
 ## 📚 Table of Contents
- 
+
+- [Demo](#-demo)
 - [Overview](#-overview)
 - [Features](#-features)
 - [Supported Languages & Ecosystems](#-supported-languages--ecosystems)
@@ -42,6 +43,17 @@
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Author](#-author)
+
+---
+
+## 🎬 Demo
+
+
+*RoasterBro turning the roast on itself:*
+
+https://github.com/user-attachments/assets/58509524-e234-4334-8fbe-d834b3fd6819
+
+*Yes, we let it roast its own codebase. It did not go easy on us.*
 
 ---
 
