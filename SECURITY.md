@@ -17,6 +17,7 @@ Instead, report it privately and directly to the developer:
 
 - GitHub: [@gaoharimran29-glitch](https://github.com/gaoharimran29-glitch)
 - LinkedIn: [Gaohar Imran](https://www.linkedin.com/in/gaohar-imran-5a4063379/)
+- Email: [Gaohar Imran](mailto:gaoharimran29@gmail.com)
 
 When reporting, please include:
 

@@ -32,6 +32,7 @@ If someone's behavior in this project crosses the line above, report it privatel
 
 - GitHub: [@gaoharimran29-glitch](https://github.com/gaoharimran29-glitch)
 - LinkedIn: [Gaohar Imran](https://www.linkedin.com/in/gaohar-imran-5a4063379/)
+- Email: [Gaohar Imran](mailto:gaoharimran29@gmail.com)
 
 Include links to the relevant issue/PR/comments and a short description of what happened. Reports are handled privately — you won't be dragged into a public back-and-forth for reporting something.
 
