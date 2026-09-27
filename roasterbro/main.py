@@ -35,7 +35,7 @@ BANNER = r"""
 │                     | | \ \ (_) | (_| \__ \ ||  __/ |  | |_) | | | (_) |                               │
 │                     |_|  \_\___/ \__,_|___/\__\___|_|  |_.__/|_|  \___/                                │
 │                                                                                                        │
-│           A CLI that scans your codebase, interrogates you and then roasts it. - 0.1.0                 │
+│           A CLI that scans your codebase, interrogates you and then roasts it. - 0.2.0                 │
 │                                   Made by - Gaohar Imran                                               │
 │                                                                                                        │
 ╰────────────────────────────────────────────────────────────────────────────────────────────────────────╯
@@ -91,7 +91,7 @@ class AliasedGroup(click.Group):
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"], "ignore_unknown_options":True}, invoke_without_command=True, cls=AliasedGroup)
-@click.version_option("0.1.0", "-v", "--version", prog_name="Roasterbro", message="%(prog)s %(version)s")
+@click.version_option("0.2.0", "-v", "--version", prog_name="Roasterbro", message="%(prog)s %(version)s")
 @click.pass_context
 def main(ctx) -> None:
     """RoasterBro - A CLI to roast and scan your codebase."""

@@ -2,12 +2,12 @@
 
 ## Supported Versions
 
-RoasterBro is early-stage (`0.1.0`) and does not yet maintain multiple release branches. Security fixes are made against the latest release on `main`.
+RoasterBro is early-stage (`0.2.0`) and does not yet maintain multiple release branches. Security fixes are made against the latest release on `main`.
 
 | Version | Supported |
 |---|---|
-| 0.1.x   | ✅ |
-| < 0.1.0 | ❌ |
+| 0.2.x   | ✅ |
+| < 0.2.0 | ❌ |
 
 ## Reporting a Vulnerability
 

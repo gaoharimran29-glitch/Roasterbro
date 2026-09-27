@@ -5,13 +5,13 @@
 
 ### A CLI that scans your codebase, interrogates you and then roasts it.
 
-**Version 0.1.0** · Made by [Gaohar Imran](https://github.com/gaoharimran29-glitch)
+**Version 0.2.0** · Made by [Gaohar Imran](https://github.com/gaoharimran29-glitch)
 
 [![PyPI](https://img.shields.io/pypi/v/roasterbro.svg)](https://pypi.org/project/roasterbro/)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
 [![Click](https://img.shields.io/badge/built%20with-Click-informational)](https://click.palletsprojects.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#license)
-[![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)](#)
+[![Version](https://img.shields.io/badge/version-0.2.0-orange.svg)](#)
 
 </div>
 
