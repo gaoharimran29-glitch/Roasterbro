@@ -47,6 +47,8 @@ If you're working on the `roast` command or anything LLM-related, copy `.env.exa
 cp .env.example .env
 ```
 
+Remote GitHub scans do not require a token for public repositories, but setting `GITHUB_TOKEN` is recommended for private repositories and higher API limits. Never commit the token to `.env` or source control.
+
 ---
 
 ## Project Structure
@@ -84,12 +86,14 @@ roasterbro/
 │   │   ├── repo_lang_scan.py           # Programming language detection
 │   │   ├── repo_whitespace_scan.py     # Whitespace analysis
 │   │   ├── repo_roast_scan.py          # Repository roasting logic
+│   │   ├── repo_remote_scan.py         # Remote GitHub repository scanning
 │   │   └── find_llm_models.py          # LLM model discovery
 │   │
 │   ├── utils/                          # Shared utilities and configuration
 │   │   ├── helpers.py                  # Path validation and scanning helpers
 │   │   ├── config.py                   # LLM provider/config resolution
-│   │   └── constants.py                # Project-wide constants
+│   │   ├── constants.py                 # Project-wide constants
+│   │   └── github_api.py                # GitHub API client for remote scans
 │   │
 │   └── main.py                         # Click-based CLI entry point
 │
@@ -169,6 +173,11 @@ roasterbro deps ~/some-project-using-that-ecosystem
 #  - a freshly `git init`'d repo with zero commits
 #  - a non-git directory
 roasterbro gitanalyze <path>
+
+# If you touched remote scanning or GitHub API logic, test a public repository
+# and, when credentials are available, a private repository or alternate ref.
+roasterbro remote OWNER/REPO
+roasterbro remote OWNER/REPO --ref BRANCH --json remote-report.json
 ```
 
 If you changed anything path-related, also test scanning a repo that is **not** your current shell directory (`roasterbro scan ~/some-other-repo` from somewhere else) — path-resolution bugs are the easiest thing to miss here.

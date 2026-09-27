@@ -36,6 +36,7 @@
   - [fullscan](#fullscan--everything-at-once)
   - [models](#models--detect-available-llms)
   - [roast](#roast--roast-your-repo-)
+  - [remote](#remote--scan-a-github-repository)
 - [LLM Support](#-llm-support)
 - [Examples](#-examples)
 - [Known Limitations](#-known-limitations)
@@ -80,6 +81,7 @@ Think of it as part static-analysis tool, part linter, part stand-up comedian.
 * 🧠 **Model Discovery** — Detect available local LLM setups and configured cloud providers
 * 🤖 **Multi-Provider LLM Support** — Use local models through Ollama or supported online LLM providers
 * 🗂️ **Full Scan** — Run repository analysis together, with optional JSON export
+* 🌐 **Remote Scan** — Scan a GitHub repository without cloning it locally
 * 🔥 **AI Interrogation & Roast** — Answer 3 repository-based ragebait questions before receiving a personalized final roast
 * 🎯 **Evidence-Based Roasting** — Generate jokes and questions from actual repository signals instead of predefined jokes
 * ⚡ **Short Aliases** — Every command has a fast, memorable shortcut
@@ -136,7 +138,7 @@ Once installed, the `roasterbro` command will be available in your terminal.
 roasterbro COMMAND PATH [OPTIONS]
 ```
 
-> `PATH` is **required** for every command except `models` — point it at the repository you want to analyze. Use `.` to scan the current directory.
+> `PATH` is **required** for local commands except `models`. The `remote` command accepts a GitHub `owner/repo`, URL, or SSH target instead.
 
 Running `roasterbro` with no arguments displays the banner and a quick pointer to the help menu:
 
@@ -175,8 +177,9 @@ roasterbro -v
 | `fullscan` | `-f` | Run a combined full scan (with optional JSON export) |
 | `models` | `-m` | Detect local LLM models and cloud LLM provider API keys |
 | `roast` | `-r` | Interrogate the developer with 3 repository-based ragebait questions and generate a final AI roast |
+| `remote` | `-rm` | Scan a remote GitHub repository |
 
-Every command (except `models`) accepts a required `PATH` argument pointing to the repository you want to analyze.
+Every local command except `models` accepts a repository `PATH`. `remote` accepts a GitHub repository target instead.
 
 ---
 
@@ -254,6 +257,24 @@ Runs a full scan and hands the results to an LLM, which then proceeds to roast y
 | `--provider` | `google` | LLM provider company (e.g. `google`) |
 | `--llm` | `gemini-2.5-flash-lite` | Specific LLM model to use |
 
+### `remote` — Scan a GitHub Repository
+```bash
+roasterbro remote OWNER/REPO
+roasterbro -rm OWNER/REPO --ref BRANCH
+roasterbro remote https://github.com/OWNER/REPO --token TOKEN --json report.json
+```
+Downloads a temporary snapshot of the selected GitHub ref, runs the file, language, dependency, and statistics scanners against it, and removes the temporary files when the scan completes. It does not clone Git history or leave a local repository behind.
+
+Remote repository metadata comes from the GitHub API, including creation date, contributor count, commit count, latest commit date, and repository branches. Because a snapshot has no local Git checkout, remote scans report zero local branches and list GitHub branches as remote branches.
+
+| Option | Default | Description |
+|---|---|---|
+| `--ref` | Repository default branch | Branch, tag, or commit SHA to scan |
+| `--token` | `GITHUB_TOKEN` or none | GitHub API token for private repositories or higher API limits |
+| `--json <path>` | None | Save the combined remote scan output to a JSON file |
+
+For private repositories or higher API limits, set `GITHUB_TOKEN` in the environment or pass `--token` directly. Avoid committing tokens to the repository.
+
 ---
 
 ## 🤖 LLM Support
@@ -318,6 +339,9 @@ roasterbro roast . --provider google --llm gemini-2.5-flash-lite
 
 # Get roasted using a local Ollama model instead
 roasterbro roast . --provider ollama --llm llama3.2:3b
+
+# Scan a GitHub repository without cloning it
+roasterbro remote sara-czasak/py-simple-wrap
 ```
 
 ---
@@ -332,6 +356,7 @@ Being upfront about what RoasterBro doesn't do yet:
 - **`--json` on `fullscan` resolves relative to your current shell directory**, not the repository you're scanning — so `roasterbro fullscan ~/other-repo --json out.json` writes `out.json` where you ran the command, not inside `~/other-repo`.
 - **"Total Size" in `scan`/`fullscan` reflects the full directory size on disk**, including files RoasterBro otherwise excludes from its file/dependency analysis (e.g. `.git` history, `node_modules` if present). File and directory *counts* are filtered; the size figure currently is not.
 - **"Created At" is exact on macOS but approximate on Linux.** macOS exposes a true file-creation timestamp (`st_birthtime`), which RoasterBro uses when available. Most Linux filesystems don't track creation time at all, so on Linux this field falls back to `st_ctime` — the last time the directory's *metadata* changed (permissions, ownership, a rename, etc.), not when it was actually created. RoasterBro detects this automatically and labels the field `Created At (approx.*)` with an inline note whenever it's using the fallback, so you'll always know which one you're looking at.
+- **Remote scans require GitHub API access.** Public repositories work without a token within GitHub's unauthenticated rate limit. Private repositories require a token with access, and remote scans use a temporary tarball snapshot rather than a full Git clone.
 
 Found something else? Please open an issue — see [Contributing](#-contributing).
 
@@ -370,12 +395,14 @@ roasterbro/
 │   │   ├── repo_lang_scan.py           # Programming language detection
 │   │   ├── repo_whitespace_scan.py     # Whitespace analysis
 │   │   ├── repo_roast_scan.py          # Repository roasting logic
+│   │   ├── repo_remote_scan.py         # Remote GitHub repository scanning
 │   │   └── find_llm_models.py          # LLM model discovery
 │   │
 │   ├── utils/                          # Shared utilities and configuration
 │   │   ├── helpers.py                  # Path validation and scanning helpers
 │   │   ├── config.py                   # LLM provider/config resolution
-│   │   └── constants.py                # Project-wide constants
+│   │   ├── constants.py                 # Project-wide constants
+│   │   └── github_api.py                # GitHub API client for remote scans
 │   │
 │   └── main.py                         # Click-based CLI entry point
 │

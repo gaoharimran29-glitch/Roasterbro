@@ -13,6 +13,8 @@ from roasterbro.tools.repo_lang_scan import languages_present
 from roasterbro.tools.repo_whitespace_scan import whitespace_scan
 from roasterbro.tools.repo_roast_scan import full_scan_for_roast, generate_roast, make_json_safe
 from roasterbro.tools.find_llm_models import find_models
+from roasterbro.tools.repo_remote_scan import remote_scan_findings
+from roasterbro.utils.github_api import GitHubAPIError
 
 from roasterbro.output_formatter.scan_output_formatter import print_scan_output
 from roasterbro.output_formatter.git_output_formatter import print_git_output
@@ -50,7 +52,8 @@ class AliasedGroup(click.Group):
         "-w": "whitespace",
         "-f": "fullscan",
         "-m": "models",
-        "-r": "roast"
+        "-r": "roast",
+        "-rm": "remote"
     }
 
 
@@ -258,6 +261,46 @@ def roast(path: str | None, llm: str, provider: str) -> None:
     llm_instance = get_llm(provider, llm)
     result = full_scan_for_roast(cwd)
     asyncio.run(generate_roast(result, llm=llm_instance))
+
+
+@main.command()
+@click.argument("target", required=True)
+@click.option("--ref", default=None, help="Branch, tag, or commit SHA to scan (defaults to the repo's default branch)")
+@click.option("--token", default=None, help="GitHub API token (or set GITHUB_TOKEN env var)")
+@click.option("--json", "json_path", type=click.Path(writable=True, file_okay=True, dir_okay=False), default=None, help="Save the combined scan output to a JSON file")
+def remote(target: str, ref: str | None, token: str | None, json_path: str | None) -> None:
+    """Scan a remote GitHub repository (owner/repo or a full GitHub URL)"""
+    json_path = str(Path(json_path).resolve()) if json_path else None
+
+    try:
+        result = remote_scan_findings(target, ref=ref, token=token)
+    except (GitHubAPIError, ValueError) as e:
+        click.secho(f"\n✖ {e}", fg="red", bold=True)
+        raise click.exceptions.Exit(1)
+
+    meta = result["GitHub Metadata"]
+    click.secho(f"📦 {meta['full_name']}", fg="cyan", bold=True)
+    if meta.get("description"):
+        click.secho(f"   {meta['description']}", fg="white")
+    click.secho(f"   Stars: {meta['stargazers_count']}  Forks: {meta['forks_count']}  Open issues: {meta['open_issues_count']}", fg="yellow")
+    click.secho("-" * 50, fg="bright_black")
+
+    print_scan_output(result["Repo Info"])
+    print_lang_output(result["Languages"])
+    print_dep_output(result["Dependencies"])
+    print_filestats_output(result["File Stats"])
+    print_git_output(result["Git Info"])
+
+    if json_path:
+        combined = make_json_safe(result)
+        try:
+            with open(json_path, "w", encoding="utf-8") as f:
+                json.dump(combined, f, indent=4, ensure_ascii=False)
+            click.echo(click.style(f"\n💾 Successfully saved scan results to: {json_path}", fg="green"))
+        except Exception as e:
+            click.echo(click.style(f"\n❌ Failed to save JSON file: {e}", fg="red"), err=True)
+
+    click.secho(" ✨ Done!\n", fg="green", bold=True)
 
 
 if __name__ == "__main__":
