@@ -12,6 +12,7 @@
 [![Click](https://img.shields.io/badge/built%20with-Click-informational)](https://click.palletsprojects.com/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](#license)
 [![Version](https://img.shields.io/badge/version-0.2.0-orange.svg)](#)
+[![XERJ Corpus Hub contributor](https://hub.xerj.org/contributors/gaoharimran29-glitch/badge.svg)](https://hub.xerj.org/contributors/gaoharimran29-glitch)
 
 </div>
 
